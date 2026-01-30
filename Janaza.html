@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hajiawa Modern App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Setup */
+        body { margin: 0; padding: 0; background: #0f172a; overflow: hidden; font-family: 'Vazirmatn', sans-serif; touch-action: none; }
+        
+        /* Map Container (Fixed) */
+        #map-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
+        #map { height: 100%; width: 100%; }
+
+        /* --- MARKER STYLES (NEW) --- */
+        
+        /* 1. Normal Mosque Marker (Golden Moon) */
+        .mosque-marker-container {
+            display: flex; justify-content: center; align-items: center;
+        }
+        .mosque-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* 2. Custom Mosque Marker (Purple Pin) */
+        .custom-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            border: 2px solid white; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* 3. FUNERAL MARKER (The Big One) */
+        .funeral-marker-container {
+            position: relative; display: flex; flex-direction: column; align-items: center;
+        }
+        /* The Label "پرسە" */
+        .funeral-label {
+            background: #ef4444; color: white; font-weight: 900; font-size: 10px;
+            padding: 2px 6px; border-radius: 8px; margin-bottom: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); animation: bounce-tiny 1s infinite;
+        }
+        /* The Pin Body */
+        .funeral-pin {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            border: 3px solid white; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 20px; z-index: 10;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.3);
+        }
+        /* The Radar Ripple Effect */
+        .radar-ring {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 44px; height: 44px; background: rgba(239, 68, 68, 0.6);
+            border-radius: 50%; z-index: 0;
+            animation: radar 2s infinite ease-out;
+            top: 28px; /* Adjust based on label height */
+        }
+        
+        @keyframes radar {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+        }
+        @keyframes bounce-tiny {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* UI Styling */
+        .glass {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Admin Overlay */
+        #adminOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px);
+        }
+        #adminOverlay.active { opacity: 1; pointer-events: auto; }
+        #adminCard { width: 90%; max-width: 380px; transform: scale(0.95); transition: transform 0.3s; }
+        #adminOverlay.active #adminCard { transform: scale(1); }
+
+    </style>
+</head>
+<body class="text-white select-none">
+
+    <div id="splash" class="fixed inset-0 bg-slate-900 z-[9999] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="relative mb-4">
+            <div class="w-24 h-24 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl rotate-6">
+                <i class="fas fa-kaaba text-5xl text-white"></i>
+            </div>
+            <div class="absolute -bottom-2 -right-2 bg-yellow-500 rounded-full p-2 border-4 border-slate-900">
+                <i class="fas fa-map-location-dot text-white"></i>
+            </div>
+        </div>
+        <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">حاجیاوا <span class="text-white font-thin">نەخشە</span></h1>
+        <p class="text-gray-500 text-sm mt-2 font-medium">✨ وەشانی پێشکەوتوو</p>
+    </div>
+
+    <div id="map-container"><div id="map"></div></div>
+
+    <div class="fixed inset-0 pointer-events-none z-[1000] flex flex-col justify-between p-5">
+        
+        <div class="flex justify-between items-start mt-2">
+            <div class="glass px-3 py-1.5 rounded-full flex items-center gap-2 pointer-events-auto">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-xs font-bold text-gray-300">Live</span>
+            </div>
+
+            <div class="flex flex-col gap-3 pointer-events-auto">
+                <button onclick="toggleAdmin()" class="glass w-12 h-12 rounded-2xl flex items-center justify-center text-gray-300 active:scale-90 transition border-t border-white/10 shadow-xl">
+                    <i class="fas fa-sliders text-lg"></i>
+                </button>
+                <button onclick="locateUser(true)" class="glass w-12 h-12 rounded-2xl flex items-center justify-center text-blue-400 active:scale-90 transition border-t border-white/10 shadow-xl">
+                    <i class="fas fa-crosshairs text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="routeInfo" class="glass translate-y-[120%] transition-transform duration-500 rounded-[2rem] p-6 pointer-events-auto border-t border-white/10 shadow-2xl">
+            <div class="w-12 h-1 bg-white/10 rounded-full mx-auto mb-4"></div>
+            
+            <div class="flex gap-4">
+                <div class="flex-1">
+                    <div id="funeralBadge" class="hidden inline-flex items-center gap-1.5 bg-red-500/10 text-red-400 px-3 py-1 rounded-lg text-[11px] font-black border border-red-500/20 mb-2">
+                        <i class="fas fa-circle-exclamation animate-pulse"></i> ئاگاداری پرسە
+                    </div>
+                    
+                    <h2 class="text-2xl font-black text-white leading-tight" id="destName">...</h2>
+                    <div id="funeralDetails" class="hidden mt-2 bg-white/5 p-3 rounded-xl border-r-2 border-red-500"></div>
+
+                    <div class="flex gap-3 mt-4">
+                        <div class="bg-blue-500/10 px-3 py-1.5 rounded-lg text-blue-400 text-sm font-bold flex items-center gap-2">
+                            <i class="fas fa-route"></i> <span id="distVal">...</span>
+                        </div>
+                        <div class="bg-green-500/10 px-3 py-1.5 rounded-lg text-green-400 text-sm font-bold flex items-center gap-2">
+                            <i class="fas fa-stopwatch"></i> <span id="timeVal">...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="openGoogleMaps()" class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl text-white shadow-lg active:scale-95 flex items-center justify-center border-t border-white/20">
+                    <i class="fas fa-location-arrow text-2xl transform -rotate-45"></i>
+                </button>
+            </div>
+            
+            <button onclick="cancelRoute()" class="w-full mt-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl font-bold text-sm text-gray-400 transition">
+                لابردن ✕
+            </button>
+        </div>
+    </div>
+
+    <div id="adminOverlay">
+        <div id="adminCard" class="glass rounded-3xl p-6 border border-gray-700 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="flex justify-between items-center mb-6 relative z-10">
+                <div>
+                    <h2 class="text-xl font-black text-white">بەڕێوەبردن ⚙️</h2>
+                    <p class="text-xs text-gray-400">ڕێکخستنی نەخشەی حاجیاوا</p>
+                </div>
+                <button onclick="toggleAdmin()" class="w-8 h-8 rounded-full bg-white/10 text-gray-400 flex items-center justify-center hover:bg-red-500/20 hover:text-red-500 transition">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="flex bg-black/40 p-1.5 rounded-xl mb-6 relative z-10">
+                <button onclick="setTab('funeral')" id="btnFuneral" class="flex-1 py-2.5 rounded-lg text-xs font-bold bg-gray-700 text-white shadow transition-all flex justify-center items-center gap-2">
+                    <i class="fas fa-book-quran"></i> پرسە
+                </button>
+                <button onclick="setTab('mosque')" id="btnMosque" class="flex-1 py-2.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-all flex justify-center items-center gap-2">
+                    <i class="fas fa-map-pin"></i> مزگەوت
+                </button>
+            </div>
+
+            <div id="tabFuneralContent" class="space-y-4 relative z-10">
+                <div class="space-y-1">
+                    <label class="text-[10px] text-gray-500 mr-2">مزگەوت دیاری بکە</label>
+                    <select id="mosqueSelect" class="w-full bg-black/30 border border-gray-600 rounded-xl p-3 text-sm text-right text-white outline-none focus:border-blue-500 transition"></select>
+                </div>
+                <div class="space-y-1">
+                     <label class="text-[10px] text-gray-500 mr-2">زانیارییەکان</label>
+                    <input type="text" id="deceasedName" placeholder="ناوی کۆچکردوو" class="w-full bg-black/30 border border-gray-600 rounded-xl p-3 text-sm text-right text-white outline-none focus:border-blue-500 mb-2">
+                    <input type="text" id="prayerTime" placeholder="کاتی نوێژ (٤:٠٠)" class="w-full bg-black/30 border border-gray-600 rounded-xl p-3 text-center text-sm text-white outline-none focus:border-blue-500">
+                </div>
+                <button onclick="saveFuneral()" class="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-red-900/30 active:scale-95 transition flex justify-center items-center gap-2">
+                    <i class="fas fa-bullhorn"></i> بڵاوکردنەوە
+                </button>
+            </div>
+
+            <div id="tabMosqueContent" class="hidden space-y-4 text-center relative z-10">
+                <div class="p-5 bg-purple-500/10 rounded-2xl border border-purple-500/20 border-dashed">
+                    <i class="fas fa-map-location-dot text-3xl text-purple-400 mb-3 block"></i>
+                    <p class="text-sm text-gray-300 font-bold">زیادکردنی مزگەوت 🕌</p>
+                    <p class="text-[10px] text-gray-500 mt-1">ئەگەر مزگەوتێک لە نەخشە نییە، خۆت زیادی بکە.</p>
+                </div>
+                <button onclick="activateAddMode()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-purple-900/30 active:scale-95 transition flex justify-center items-center gap-2">
+                    <i class="fas fa-fingerprint"></i> دیاریکردن لەسەر نەخشە
+                </button>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-white/5 flex justify-between items-center">
+                <button onclick="resetApp()" class="text-[10px] text-red-400 hover:text-red-300 flex items-center gap-1">
+                    <i class="fas fa-trash"></i> سڕینەوە
+                </button>
+                <span class="text-[10px] text-gray-600 font-mono">Hajiawa v4.0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Setup
+        let map, userPos, routeLine, userMarker;
+        let allMosques = [];
+        let isAddMode = false;
+        let selectedDest = null;
+
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => document.getElementById('splash').remove(), 700);
+            }, 2500);
+            initMap();
+        };
+
+        function initMap() {
+            // Disable interaction initially (tap enabled manually)
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([36.2369, 44.7869], 14);
+            
+            L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', { // 'm' for standard roadmap (cleaner), 's' for sat
+                maxZoom: 20, subdomains: ['mt0','mt1','mt2','mt3']
+            }).addTo(map);
+            
+            // Or use Satellite if preferred:
+            // L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {...}).addTo(map);
+
+            loadData();
+            locateUser(false);
+
+            map.on('click', (e) => { if(isAddMode) addNewMosque(e.latlng); });
+        }
+
+        async function loadData() {
+            // Fetch Online
+            const query = `[out:json];(node["amenity"="place_of_worship"]["religion"="muslim"](36.21,44.75,36.26,44.83);way["amenity"="place_of_worship"]["religion"="muslim"](36.21,44.75,36.26,44.83););out center;`;
+            let onlineData = [];
+            try {
+                const res = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:query});
+                const d = await res.json();
+                onlineData = d.elements.map(e=>({
+                    id: e.id, lat: e.lat||e.center.lat, lng: e.lon||e.center.lon,
+                    name: e.tags['name:ckb']||e.tags['name']||"مزگەوت", type:'online'
+                }));
+            } catch(e){}
+
+            // Fetch Local
+            const localData = JSON.parse(localStorage.getItem('hajiawaCustomMosques')) || [];
+            allMosques = [...onlineData, ...localData];
+
+            renderMarkers();
+            populateSelect();
+        }
+
+        function renderMarkers() {
+            // Clear markers except user
+            map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
+            
+            const funerals = JSON.parse(localStorage.getItem('hajiawaFunerals')) || {};
+
+            allMosques.forEach(m => {
+                const isFuneral = !!funerals[m.id];
+                let icon;
+
+                if(isFuneral) {
+                    // --- NEW FANCY FUNERAL MARKER ---
+                    icon = L.divIcon({
+                        className: 'bg-transparent',
+                        html: `
+                            <div class="radar-ring"></div>
+                            <div class="funeral-marker-container">
+                                <div class="funeral-label">پرسە</div>
+                                <div class="funeral-pin">
+                                    <i class="fas fa-hands-praying"></i>
+                                </div>
+                            </div>
+                        `,
+                        iconSize: [50, 60],
+                        iconAnchor: [25, 45] // Tip of the pin logic
+                    });
+                } else {
+                    // Normal & Custom
+                    const isCustom = m.type === 'custom';
+                    const bgClass = isCustom ? 'custom-icon' : 'mosque-icon';
+                    const iconClass = isCustom ? 'fa-thumbtack' : 'fa-star-and-crescent';
+                    
+                    icon = L.divIcon({
+                        className: 'bg-transparent',
+                        html: `<div class="${bgClass}"><i class="fas ${iconClass}"></i></div>`,
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    });
+                }
+
+                L.marker([m.lat, m.lng], { icon }).addTo(map).on('click', () => {
+                    if(!isAddMode) showRoute(m, funerals[m.id]);
+                });
+            });
+        }
+
+        // --- ADMIN & LOGIC ---
+        function toggleAdmin() {
+            const overlay = document.getElementById('adminOverlay');
+            const isActive = overlay.classList.contains('active');
+            
+            if(isActive) {
+                overlay.classList.remove('active');
+                map.dragging.enable();
+            } else {
+                overlay.classList.add('active');
+                map.dragging.disable();
+            }
+        }
+
+        function setTab(t) {
+            const f = document.getElementById('tabFuneralContent');
+            const m = document.getElementById('tabMosqueContent');
+            const bf = document.getElementById('btnFuneral');
+            const bm = document.getElementById('btnMosque');
+
+            if(t === 'funeral') {
+                f.classList.remove('hidden'); m.classList.add('hidden');
+                bf.className = "flex-1 py-2.5 rounded-lg text-xs font-bold bg-gray-700 text-white shadow transition-all flex justify-center items-center gap-2";
+                bm.className = "flex-1 py-2.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-all flex justify-center items-center gap-2";
+            } else {
+                f.classList.add('hidden'); m.classList.remove('hidden');
+                bm.className = "flex-1 py-2.5 rounded-lg text-xs font-bold bg-purple-600 text-white shadow transition-all flex justify-center items-center gap-2";
+                bf.className = "flex-1 py-2.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition-all flex justify-center items-center gap-2";
+            }
+        }
+
+        function populateSelect() {
+            const s = document.getElementById('mosqueSelect');
+            s.innerHTML = '<option value="">هەڵبژاردن...</option>';
+            allMosques.forEach(m => s.innerHTML += `<option value="${m.id}">${m.type==='custom'?'📌 ':''}${m.name}</option>`);
+        }
+
+        function saveFuneral() {
+            const id = document.getElementById('mosqueSelect').value;
+            const name = document.getElementById('deceasedName').value;
+            const time = document.getElementById('prayerTime').value;
+            if(!id || !name) return alert('زانیاری کەمە!');
+            
+            const db = JSON.parse(localStorage.getItem('hajiawaFunerals')) || {};
+            db[id] = { name, time, timestamp: Date.now() };
+            localStorage.setItem('hajiawaFunerals', JSON.stringify(db));
+            renderMarkers(); toggleAdmin(); alert('تم!');
+        }
+
+        function activateAddMode() {
+            isAddMode = true; toggleAdmin(); alert("شوێنێک لەسەر نەخشە دیاری بکە 👇");
+        }
+
+        function addNewMosque(ll) {
+            const n = prompt("ناوی مزگەوت؟");
+            if(n) {
+                const db = JSON.parse(localStorage.getItem('hajiawaCustomMosques')) || [];
+                db.push({ id: 'c_'+Date.now(), lat: ll.lat, lng: ll.lng, name: n, type: 'custom' });
+                localStorage.setItem('hajiawaCustomMosques', JSON.stringify(db));
+                loadData();
+            }
+            isAddMode = false;
+        }
+
+        function showRoute(dest, fun) {
+            selectedDest = dest;
+            document.getElementById('destName').innerText = dest.name;
+            const b = document.getElementById('funeralBadge');
+            const d = document.getElementById('funeralDetails');
+            
+            if(fun) {
+                b.classList.remove('hidden'); d.classList.remove('hidden');
+                d.innerHTML = `<div class="text-sm font-bold text-white mb-1">کۆچکردوو: ${fun.name}</div><div class="text-xs text-gray-400">کاتی نوێژ: ${fun.time}</div>`;
+            } else {
+                b.classList.add('hidden'); d.classList.add('hidden');
+            }
+            
+            document.getElementById('routeInfo').style.transform = "translateY(0)";
+
+            if(userPos) {
+                if(routeLine) map.removeLayer(routeLine);
+                fetch(`https://router.project-osrm.org/route/v1/driving/${userPos.lng},${userPos.lat};${dest.lng},${dest.lat}?overview=full&geometries=geojson`)
+                .then(r=>r.json()).then(data=>{
+                    const r = data.routes[0];
+                    routeLine = L.polyline(r.geometry.coordinates.map(c=>[c[1],c[0]]), { color: '#3b82f6', weight: 6 }).addTo(map);
+                    map.fitBounds(routeLine.getBounds(), {padding:[80,80]});
+                    document.getElementById('distVal').innerText = (r.distance/1000).toFixed(1)+'km';
+                    document.getElementById('timeVal').innerText = Math.round(r.duration/60)+'min';
+                });
+            }
+        }
+
+        function cancelRoute() {
+            document.getElementById('routeInfo').style.transform = "translateY(120%)";
+            if(routeLine) map.removeLayer(routeLine);
+            map.flyTo(userPos || [36.2369, 44.7869], 15);
+        }
+
+        function openGoogleMaps() {
+            if(selectedDest) location.href = `https://www.google.com/maps/dir/?api=1&destination=${selectedDest.lat},${selectedDest.lng}`;
+        }
+
+        function locateUser(zoom) {
+            navigator.geolocation.getCurrentPosition(p => {
+                userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+                if(userMarker) map.removeLayer(userMarker);
+                // Glowing Blue Dot for User
+                const icon = L.divIcon({ className: 'bg-transparent', html: '<div class="w-4 h-4 bg-blue-500 border-2 border-white rounded-full shadow-[0_0_15px_#3b82f6]"></div>' });
+                userMarker = L.marker([userPos.lat, userPos.lng], {icon}).addTo(map);
+                if(zoom) map.flyTo([userPos.lat, userPos.lng], 17);
+            }, ()=>alert('GPS Failed'), {enableHighAccuracy:true});
+        }
+
+        function resetApp() { if(confirm('All data delete?')) { localStorage.clear(); location.reload(); } }
+    </script>
+</body>
+</html>
