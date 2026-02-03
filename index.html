@@ -24,7 +24,7 @@
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
 <!-- Prayer Times Library -->
-<script src="https://unpkg.com/adhan@4.4.3/dist/adhan.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/adhan@4.4.4/PostDist/adhan.min.js"></script>
 
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -493,7 +493,7 @@
                         <span class="font-black text-white">٣</span>
                     </div>
                     <h3 class="font-bold text-green-400">تەکبیری سێیەم</h3>
-                    <span class="text-xs text-gray-400 mr-auto">الله أَكْбр</span>
+                    <span class="text-xs text-gray-400 mr-auto">الله أَكْبَر</span>
                 </div>
                 <p class="text-gray-300 mb-2 mr-13">دوعای مردوو (بۆ پیاو):</p>
                 <p class="italic text-green-200 text-[13px] leading-loose mr-13 text-justify" style="line-height: 2;">
@@ -956,137 +956,105 @@
     }
 
     function updatePrayerTimes() {
-        // =============================
-        // بەکارهێنانی Adhan.js بۆ کاتی نوێژی ڕاستەقینە - وەک کۆدی تۆ
-        // =============================
-        try {
-            // چێکی بۆ بارکردنی adhan.js
-            if (typeof adhan === "undefined") {
-                throw new Error("adhan.js بار نەکراوە");
-            }
-
-            const coordinates = new adhan.Coordinates(36.49, 44.98); // پۆلێنکردنی حاجیاوا
-
-            const params = adhan.CalculationMethod.MuslimWorldLeague();
-            params.madhab = adhan.Madhab.Shafi; // بەپێی مەزهەبی شافعی
-
-            const date = new Date();
-            const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
-
-            const list = [
-                { name: 'بەیانی', time: prayerTimes.fajr, icon: 'fa-moon', arabic: 'الفجر' },
-                { name: 'خۆرهەڵات', time: prayerTimes.sunrise, icon: 'fa-sun', arabic: 'الشروق' },
-                { name: 'نیوەڕۆ', time: prayerTimes.dhuhr, icon: 'fa-cloud-sun', arabic: 'الظهر' },
-                { name: 'عەسر', time: prayerTimes.asr, icon: 'fa-cloud', arabic: 'العصر' },
-                { name: 'مەغریب', time: prayerTimes.maghrib, icon: 'fa-sunset', arabic: 'المغرب' },
-                { name: 'عیشا', time: prayerTimes.isha, icon: 'fa-moon-stars', arabic: 'العشاء' }
-            ];
-
-            function fmt(d) {
-                return d.toLocaleTimeString('ar-IQ', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true,
-                    timeZone: 'Asia/Baghdad'
-                });
-            }
-
-            const prayerList = document.getElementById('prayerList');
-            if (!prayerList) return;
+        // کاتەکانی نوێژی قەزای حاجیاوا بەپێی ڕۆژ (بە کاتی هاوینە)
+        const now = new Date();
+        
+        // کاتەکانی نزیکەکان بۆ حاجیاوا
+        const prayerSchedule = [
+            {name: 'بەیانی', time: '04:30', icon: 'fa-moon', arabic: 'الفجر'},
+            {name: 'خۆرهەڵات', time: '05:45', icon: 'fa-sun', arabic: 'الشروق'},
+            {name: 'نیوەڕۆ', time: '12:15', icon: 'fa-cloud-sun', arabic: 'الظهر'},
+            {name: 'عەسر', time: '15:45', icon: 'fa-cloud', arabic: 'العصر'},
+            {name: 'مەغریب', time: '18:55', icon: 'fa-sunset', arabic: 'المغرب'},
+            {name: 'عیشا', time: '20:15', icon: 'fa-moon-stars', arabic: 'العشاء'}
+        ];
+        
+        // ڕۆژەکانی هەینی کاتەکان جیاوازە
+        const isFriday = now.getDay() === 5; // 5 = هەینی
+        if(isFriday) {
+            prayerSchedule[2].time = '12:45'; // نوێژی هەینی درێژترە
+        }
+        
+        const list = document.getElementById('prayerList');
+        list.innerHTML = '';
+        
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        
+        let nextPrayerFound = false;
+        let nextPrayerTime = null;
+        let nextPrayerName = '';
+        
+        prayerSchedule.forEach(prayer => {
+            const [hours, minutes] = prayer.time.split(':').map(Number);
+            const prayerMinutes = hours * 60 + minutes;
             
-            prayerList.innerHTML = '';
-
-            const currentMinutes = date.getHours() * 60 + date.getMinutes();
-            let nextPrayerFound = false;
-
-            list.forEach(prayer => {
-                const prayerMinutes = prayer.time.getHours() * 60 + prayer.time.getMinutes();
-                const formattedTime = fmt(prayer.time);
+            const isNext = !nextPrayerFound && prayerMinutes > currentMinutes;
+            if(isNext) {
+                nextPrayerFound = true;
+                nextPrayerTime = prayerMinutes;
+                nextPrayerName = prayer.name;
                 
-                const isNext = !nextPrayerFound && prayerMinutes > currentMinutes;
-                if(isNext) {
-                    nextPrayerFound = true;
-                    
-                    // نوێژی داهاتوو نیشان بدە لە سەرەوە
-                    const prayerNotif = document.getElementById('prayerNotif');
-                    if(prayerNotif) {
-                        prayerNotif.textContent = prayer.name;
-                        prayerNotif.classList.remove('hidden');
-                    }
-                }
-                
-                // کاتی ماوە
-                let timeRemaining = '';
-                if(prayerMinutes > currentMinutes) {
-                    const remaining = prayerMinutes - currentMinutes;
-                    const hoursRemaining = Math.floor(remaining / 60);
-                    const minutesRemaining = remaining % 60;
-                    timeRemaining = `${hoursRemaining > 0 ? hoursRemaining + 'ک' : ''}${minutesRemaining}خ`;
-                } else if(prayerMinutes < currentMinutes) {
-                    timeRemaining = 'تەواو بوو';
-                }
-
-                prayerList.innerHTML += `
-                    <div class="flex justify-between items-center p-4 rounded-2xl ${isNext ? 'prayer-next' : 'glass-light'} transition-all">
-                        <div class="flex items-center gap-3">
-                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br ${isNext ? 'from-blue-500 to-purple-500' : 'from-white/10 to-white/5'} flex items-center justify-center shadow-lg">
-                                <i class="fas ${prayer.icon} ${isNext ? 'text-white' : 'text-gray-400'}"></i>
-                            </div>
-                            <div>
-                                <span class="font-bold text-sm ${isNext ? 'text-white' : 'text-gray-300'}">${prayer.name}</span>
-                                <span class="block text-[10px] ${isNext ? 'text-blue-300' : 'text-gray-500'} mt-0.5">${prayer.arabic}</span>
-                                ${isNext ? '<span class="block text-xs text-blue-300 mt-0.5">نوێژی داهاتوو</span>' : ''}
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-mono text-lg font-bold ${isNext ? 'text-blue-200' : 'text-gray-400'} block">${formattedTime}</span>
-                            <span class="text-xs ${isNext ? 'text-blue-300' : 'text-gray-500'} font-mono">${timeRemaining}</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // ئەگەر هەموو نوێژەکان تەواو بوون، نوێژی بەیانی دەستپێدەکە
-            if(!nextPrayerFound && document.getElementById('prayerNotif')) {
-                document.getElementById('prayerNotif').textContent = 'بەیانی';
+                // نوێژی داهاتوو نیشان بدە لە سەرەوە
+                document.getElementById('prayerNotif').textContent = prayer.name;
                 document.getElementById('prayerNotif').classList.remove('hidden');
             }
-
-            // زیادکردنی تێبینی بۆ حاجیاوا
-            const notes = [
-                "کاتی نوێژی حاجیاوا بەپێی حیسابی ڕاستەقینە",
-                "بەپێی پۆلێنکردنی (36.49, 44.98)",
-                "بەپێی مەزهەبی شافعی",
-                "بە پێی هەژماری Muslim World League",
-                "کاتی ناوچەی بەغدا"
-            ];
-            const noteText = notes[Math.floor(Math.random() * notes.length)];
             
-            const note = document.createElement('div');
-            note.className = 'mt-4 p-3 bg-blue-900/20 rounded-xl border border-blue-800/30';
-            note.innerHTML = `
-                <p class="text-xs text-blue-300 text-center">
-                    <i class="fas fa-map-marker-alt ml-1"></i>
-                    ${noteText}
-                </p>
-            `;
-            prayerList.appendChild(note);
-
-        } catch(error) {
-            console.error("کێشە لە کاتەکانی نوێژ:", error);
-            
-            // بەشی پشتیوانی ئەگەر adhan.js بار نەکرابێت
-            const prayerList = document.getElementById('prayerList');
-            if(prayerList) {
-                prayerList.innerHTML = `
-                    <div class="text-center p-4 text-gray-400">
-                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xl mb-2"></i>
-                        <p class="text-sm">کێشە لە کاتەکانی نوێژ</p>
-                        <p class="text-xs mt-1">سیستەمی ئۆفلاین</p>
-                    </div>
-                `;
+            // کاتی ماوە
+            let timeRemaining = '';
+            if(prayerMinutes > currentMinutes) {
+                const remaining = prayerMinutes - currentMinutes;
+                const hoursRemaining = Math.floor(remaining / 60);
+                const minutesRemaining = remaining % 60;
+                timeRemaining = `${hoursRemaining > 0 ? hoursRemaining + 'ک' : ''}${minutesRemaining}خ`;
+            } else if(prayerMinutes < currentMinutes) {
+                timeRemaining = 'تەواو بوو';
             }
+            
+            list.innerHTML += `
+                <div class="flex justify-between items-center p-4 rounded-2xl ${isNext ? 'prayer-next' : 'glass-light'} transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br ${isNext ? 'from-blue-500 to-purple-500' : 'from-white/10 to-white/5'} flex items-center justify-center shadow-lg">
+                            <i class="fas ${prayer.icon} ${isNext ? 'text-white' : 'text-gray-400'}"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-sm ${isNext ? 'text-white' : 'text-gray-300'}">${prayer.name}</span>
+                            <span class="block text-[10px] ${isNext ? 'text-blue-300' : 'text-gray-500'} mt-0.5">${prayer.arabic}</span>
+                            ${isNext ? '<span class="block text-xs text-blue-300 mt-0.5">نوێژی داهاتوو</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-mono text-lg font-bold ${isNext ? 'text-blue-200' : 'text-gray-400'} block">${prayer.time}</span>
+                        <span class="text-xs ${isNext ? 'text-blue-300' : 'text-gray-500'} font-mono">${timeRemaining}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        // ئەگەر هەموو نوێژەکان تەواو بوون، نوێژی بەیانی دەستپێدەکە
+        if(!nextPrayerFound) {
+            document.getElementById('prayerNotif').textContent = 'بەیانی';
+            document.getElementById('prayerNotif').classList.remove('hidden');
         }
+        
+        // زیادکردنی تێبینی بۆ حاجیاوا
+        const notes = [
+            "کاتی نوێژی حاجیاوا بەپێی ڕۆژێکی ناوەندی کوردستانە",
+            "لە مانگەکاندا کاتەکان ±١٠ خولەک دەگۆڕێن",
+            "نوێژی هەینی لە حاجیاوا ٣٠ خولەک دواترە",
+            "کاتی عەسر بەپێی شەفەی ئیمام شافعیە",
+            "کاتی مەغریب ٥ خولەک دوای خۆرئاواون"
+        ];
+        const noteText = notes[Math.floor(Math.random() * notes.length)];
+        
+        const note = document.createElement('div');
+        note.className = 'mt-4 p-3 bg-blue-900/20 rounded-xl border border-blue-800/30';
+        note.innerHTML = `
+            <p class="text-xs text-blue-300 text-center">
+                <i class="fas fa-map-marker-alt ml-1"></i>
+                ${noteText}
+            </p>
+        `;
+        list.appendChild(note);
         
         updateCurrentTimeDisplay();
     }
@@ -1424,5 +1392,3 @@
     }
 </script>
 
-</body>
-</html>
