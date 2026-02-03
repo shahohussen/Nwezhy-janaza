@@ -840,64 +840,90 @@
         {id: "m31", name: "مزگەوتی سەلاحەدین", lat: 36.2340, lng: 44.7850}
     ];
 
+        // ئەم بەشە بخەرە شوێنی window.addEventListener('load', ...) ی کۆنەکە
     window.addEventListener('load', async () => {
         console.log("🚀 دەستپێکردنی بارکردنی سیستەم...");
-        
-        try {
-            // زیادکردنی timeout بۆ Firebase
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Firebase timeout')), 10000)
-            );
-            
-            // Firebase v10
-            const firebasePromise = (async () => {
-                const app = firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                console.log("✅ Firebase گرێدراوە!");
-                updateLoadStatus("گرێدراوە...");
-            })();
-            
-            await Promise.race([firebasePromise, timeoutPromise]);
-            
-        } catch(e) {
-            console.warn("⚠️ Firebase گرێنەخرا، ئۆفلاین دەڕۆین:", e);
-            updateLoadStatus("ئۆفلاین...");
-            // زیادکردنی db = null بۆ ئۆفلاین مۆد
-            db = null;
-        }
 
-        // دەستپێکردنی نەخشە بێگوێدانە Firebase
-        initMap();
-        
-        // بارکردنی مزگەوتەکان بە شێوەیێک کە لە هەر حاڵەتێکدا بێت
+        // فەرمانی لابردنی سپلاش سکرین (بە جیا دەینوسین)
+        const removeSplash = () => {
+            const splash = document.getElementById('splashScreen');
+            if(splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 700);
+            }
+        };
+
+        // سەلامەتی: دانانی تایمەرێک کە ئەگەر دوای ٥ چرکە بەرنامەکە نەکرایەوە، بە زۆر بیکاتەوە
+        // ئەمە چارەسەری کێشەکەت دەکات
         setTimeout(() => {
+            console.log("⚠️ کات تەواو بوو (Safety Timeout) - لابردنی شاشە بە زۆر");
+            removeSplash();
+        }, 5000);
+
+        try {
+            // پشکنین بۆ دڵنیابوون لەوەی کتێبخانەکان بار بوون
+            if (typeof L === 'undefined') throw new Error("کتێبخانەی نەخشە (Leaflet) بار نەبووە");
+            if (typeof adhan === 'undefined') console.warn("کتێبخانەی بانگ (Adhan) بار نەبووە");
+
+            // هەوڵدان بۆ گرێدانی فایەربەیس
+            try {
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Firebase timeout')), 5000)
+                );
+                
+                const firebasePromise = (async () => {
+                    if (typeof firebase !== 'undefined') {
+                        const app = firebase.initializeApp(firebaseConfig);
+                        db = firebase.database();
+                        console.log("✅ Firebase گرێدراوە!");
+                        updateLoadStatus("گرێدراوە...");
+                    } else {
+                        throw new Error("Firebase SDK نەدۆزرایەوە");
+                    }
+                })();
+                
+                await Promise.race([firebasePromise, timeoutPromise]);
+            } catch(e) {
+                console.warn("⚠️ کێشە لە فایەربەیس یان ئینتەرنێت:", e.message);
+                updateLoadStatus("ئۆفلاین مۆد...");
+                db = null; // کارکردن بە بێ داتابەیس
+                showToast("سیستەم لە دۆخی ئۆفلایندایە", "error");
+            }
+
+            // دەستپێکردنی نەخشە
+            initMap();
+            
+            // بارکردنی داتا
+            // لێرە await بەکارناهێنین تا نەبێتە هۆی وەستانی بەرنامەکە
             loadMosques().catch(e => {
                 console.error("❌ هەڵە لە بارکردنی مزگەوتەکان:", e);
-                // بەکارهێنانی مزگەوتە بنەڕەتییەکان
                 mosques = BACKUP_MOSQUES;
                 renderMarkers();
                 updateStats();
             });
-        }, 500);
-        
-        updatePrayerTimes();
-        setInterval(updatePrayerTimes, 60000);
-        setInterval(updateCurrentTimeDisplay, 1000);
-        autoDeleteOldFunerals();
-        
-        // پەنجەمە کردن لە splash screen
-        setTimeout(() => {
-            const splash = document.getElementById('splashScreen');
-            splash.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.display = 'none';
-                // تاقیکردنەوەی دیاریکردنی کێشە
-                if (mosques.length === 0) {
-                    showToast('سیستەم ئۆفلاینە، مزگەوتە بنەڕەتییەکان بارکران', 'info');
-                }
-            }, 700);
-        }, 2500);
+            
+            // ئەگەر کتێبخانەی بانگ هەبوو، کاتەکان نوێ بکەرەوە
+            if (typeof adhan !== 'undefined') {
+                updatePrayerTimes();
+                setInterval(updatePrayerTimes, 60000);
+            }
+            
+            setInterval(updateCurrentTimeDisplay, 1000);
+            autoDeleteOldFunerals();
+
+            // لابردنی سپلاش سکرین بە شێوەی ئاسایی
+            setTimeout(removeSplash, 1500);
+
+        } catch (globalError) {
+            console.error("❌ هەڵەی گەورە (Critical Error):", globalError);
+            alert("هەڵەیەک ڕوویدا: " + globalError.message + "\nتکایە دڵنیابەرەوە لە ئینتەرنێت.");
+            // تەنانەت ئەگەر هەڵەش هەبێت، سپلاشەکە لاببە تا بەکارهێنەر شتێک ببینێت
+            removeSplash(); 
+        }
     });
+
 
     function skipLoading() {
         console.log("📋 تاقیکردنەوەی پشتگرێدان دەکرێت...");
