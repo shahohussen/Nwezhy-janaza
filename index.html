@@ -1,13 +1,1467 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="ku" dir="rtl">
 <head>
-    <title>Document</title>
-</head>
-<body>
-    <script>
-        function fmt(date) {
-            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🕌 Hajiawa Ultra Supreme | نەخشەی زیرەکی پێشکەوتوو</title>
+
+<meta name="theme-color" content="#020617">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="سیستەمی زیرەکی نەخشەسازی حاجیاوا - Ultra Supreme Edition">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+<!-- Core Libraries -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<!-- Prayer Times Library -->
+<script src="https://unpkg.com/adhan@4.4.3/dist/adhan.min.js"></script>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    ultra: { 
+                        dark: '#020617', 
+                        darker: '#0f172a',
+                        card: 'rgba(15, 23, 42, 0.85)', 
+                        accent: '#3b82f6',
+                        gold: '#fbbf24'
+                    }
+                },
+                fontFamily: { 
+                    sans: ['Vazirmatn', 'sans-serif'] 
+                }
+            }
         }
-    </script>
+    }
+</script>
+
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html { 
+        height: 100%; margin: 0; padding: 0; background: #020617; overflow: hidden; 
+        font-family: 'Vazirmatn', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .bg-animated {
+        position: fixed; inset: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+        animation: pulse-bg 8s ease-in-out infinite;
+        pointer-events: none; z-index: 0;
+    }
+    @keyframes pulse-bg { 
+        0%, 100% { opacity: 0.4; } 
+        50% { opacity: 0.7; } 
+    }
+
+    #map { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
+    .leaflet-control-attribution, .leaflet-control-zoom, .leaflet-routing-container { display: none !important; }
+
+    .glass {
+        background: rgba(15, 23, 42, 0.88);
+        backdrop-filter: blur(24px) saturate(180%);
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(59, 130, 246, 0.1);
+    }
+
+    .glass-light {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .marker-funeral {
+        width: 52px; height: 52px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        border: 4px solid white; border-radius: 50% 50% 50% 0;
+        transform: rotate(-45deg);
+        display: flex; align-items: center; justify-content: center;
+        color: white;
+        box-shadow: 0 6px 24px rgba(239, 68, 68, 0.6);
+        animation: marker-bounce 2s infinite ease-in-out;
+        position: relative; cursor: pointer;
+    }
+
+    .marker-funeral::before {
+        content: ''; position: absolute; inset: -12px;
+        border: 3px solid rgba(239, 68, 68, 0.3);
+        border-radius: 50% 50% 50% 0;
+        animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .marker-funeral i {
+        transform: rotate(45deg); font-size: 22px;
+    }
+
+    .marker-mosque {
+        width: 40px; height: 40px;
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        border: 3px solid white; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: white;
+        box-shadow: 0 4px 16px rgba(251, 191, 36, 0.5);
+        transition: all 0.3s; cursor: pointer;
+    }
+
+    .marker-mosque:hover { transform: scale(1.2); }
+    .marker-mosque i { font-size: 18px; }
+
+    @keyframes marker-bounce {
+        0%, 100% { transform: translateY(0) rotate(-45deg); }
+        50% { transform: translateY(-18px) rotate(-45deg); }
+    }
+
+    @keyframes ping {
+        0% { transform: scale(1); opacity: 1; }
+        75%, 100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    .user-marker {
+        width: 20px; height: 20px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border: 4px solid white; border-radius: 50%;
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        50% { box-shadow: 0 0 50px rgba(59, 130, 246, 1); }
+    }
+
+    .loader-supreme {
+        width: 50px; height: 50px;
+        border: 4px solid rgba(59, 130, 246, 0.2);
+        border-top-color: #3b82f6;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal-container {
+        position: fixed; inset: 0;
+        background: rgba(0, 0, 0, 0.92);
+        backdrop-filter: blur(8px);
+        z-index: 7000; display: none;
+        align-items: center; justify-content: center;
+        padding: 20px;
+    }
+
+    .toast-container {
+        position: fixed; top: 24px; left: 50%;
+        transform: translateX(-50%) translateY(-120px);
+        z-index: 8000;
+        transition: transform 0.4s;
+    }
+
+    .toast-container.show {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b82f6, #2563eb); border-radius: 10px; }
+
+    input:focus, select:focus { outline: none; border-color: rgba(59, 130, 246, 0.6) !important; }
+
+    .prayer-next {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.2)) !important;
+        border: 2px solid rgba(59, 130, 246, 0.5) !important;
+        box-shadow: 0 0 24px rgba(59, 130, 246, 0.4) !important;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+    
+    .admin-btn-pulse {
+        animation: admin-pulse 2s infinite;
+    }
+    
+    @keyframes admin-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
+        50% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+    }
+</style>
+
+</head>
+
+<body class="text-white">
+
+<div class="bg-animated"></div>
+
+<!-- Splash Screen -->
+<div id="splashScreen" class="fixed inset-0 z-[9999] bg-gradient-to-br from-ultra-dark via-ultra-darker to-purple-950 flex flex-col items-center justify-center transition-opacity duration-700">
+    <div class="relative mb-8" style="animation: float 3s ease-in-out infinite;">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-[32px] blur-3xl opacity-40"></div>
+        <div class="relative w-32 h-32 rounded-[32px] bg-gradient-to-br from-blue-500 via-purple-500 to-blue-600 flex items-center justify-center shadow-2xl">
+            <i class="fas fa-kaaba text-6xl text-white"></i>
+        </div>
+    </div>
+    
+    <h1 class="text-5xl font-black tracking-[0.25em] mb-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
+        HAJIAWA
+    </h1>
+    
+    <div class="flex items-center gap-3 mb-2">
+        <div class="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+        <p class="text-blue-400 text-sm font-bold tracking-[0.3em]">ULTRA SUPREME</p>
+        <div class="h-[2px] w-12 bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+    </div>
+    
+    <p class="text-gray-500 text-xs font-mono mb-10">نەخشەی زیرەکی پێشکەوتوو v7.0</p>
+    
+    <div class="loader-supreme mb-6"></div>
+    
+    <p id="loadStatus" class="text-gray-400 text-sm font-medium">جارکردنی سیستەم...</p>
+</div>
+
+<div id="map"></div>
+
+<!-- Top Header -->
+<div class="fixed top-0 inset-x-0 z-[5000] p-4 bg-gradient-to-b from-black/90 via-black/60 to-transparent pointer-events-none">
+    <!-- ڕیزێکی یەکەم بۆ ناو و گەڕان -->
+    <div class="flex items-center justify-between pointer-events-auto max-w-2xl mx-auto gap-3 mb-2">
+        <div class="glass rounded-2xl px-4 py-2 flex items-center gap-3 shadow-2xl">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-lg">
+                <i class="fas fa-kaaba text-white text-lg"></i>
+            </div>
+            <div class="hidden sm:block">
+                <h1 class="text-sm font-black tracking-tight">HAJIAWA</h1>
+                <p class="text-[10px] text-gray-400">Ultra Supreme</p>
+            </div>
+        </div>
+
+        <div class="flex-1 glass rounded-2xl p-3 flex items-center gap-3 shadow-xl max-w-md">
+            <i class="fas fa-search text-blue-400 text-sm"></i>
+            <input id="searchInput" type="text" oninput="handleSearch()" placeholder="گەڕان بۆ مزگەوت یان پرسە..." class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500">
+            <button onclick="clearSearch()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition">
+                <i class="fas fa-times text-gray-400 text-xs"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- ڕیزێکی دووەم بۆ دوگمەکان -->
+    <div class="flex items-center justify-between pointer-events-auto max-w-2xl mx-auto gap-2">
+        <div class="flex items-center gap-2">
+            <button onclick="showAllMosques()" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95" title="هەموو مزگەوتەکان">
+                <i class="fas fa-expand-alt text-green-400"></i>
+            </button>
+            <button onclick="toggleModal('statsModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 relative" title="ئامار">
+                <i class="fas fa-chart-line text-purple-400"></i>
+                <span id="statsNotif" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-ultra-dark hidden">!</span>
+            </button>
+            <button onclick="toggleModal('prayerModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 relative" title="کاتی نوێژ">
+                <i class="fas fa-clock text-blue-400"></i>
+                <span id="prayerNotif" class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-ultra-dark hidden">1</span>
+            </button>
+            <button onclick="toggleMapStyleMenu()" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95" title="جۆری نەخشە">
+                <i class="fas fa-map text-orange-400"></i>
+            </button>
+            <button onclick="toggleModal('adminModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 admin-btn-pulse" title="ئەدمین">
+                <i class="fas fa-shield-alt text-yellow-400"></i>
+            </button>
+        </div>
+        
+        <div id="funeralBadge" class="hidden glass rounded-2xl px-4 py-2 flex items-center gap-3 border border-red-500/30 shadow-xl">
+            <div class="w-3 h-3 rounded-full bg-red-500 animate-ping absolute"></div>
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <span id="funeralCount" class="text-sm font-bold text-red-200">0 پرسە</span>
+            <i class="fas fa-hands-praying text-red-400"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Map Style Menu -->
+<div id="mapStyleMenu" class="fixed top-20 right-4 z-[6000] glass p-3 rounded-2xl shadow-2xl hidden">
+    <div class="grid grid-cols-2 gap-2">
+        <button onclick="changeMapStyle('dark')" class="p-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition flex flex-col items-center gap-1">
+            <i class="fas fa-moon text-white text-xl"></i>
+            <span class="text-xs">تاریک</span>
+        </button>
+        <button onclick="changeMapStyle('satellite')" class="p-3 rounded-xl bg-blue-700 hover:bg-blue-600 transition flex flex-col items-center gap-1">
+            <i class="fas fa-satellite text-white text-xl"></i>
+            <span class="text-xs">سەتەلایت</span>
+        </button>
+        <button onclick="changeMapStyle('street')" class="p-3 rounded-xl bg-green-700 hover:bg-green-600 transition flex flex-col items-center gap-1">
+            <i class="fas fa-road text-white text-xl"></i>
+            <span class="text-xs">شەقام</span>
+        </button>
+        <button onclick="changeMapStyle('terrain')" class="p-3 rounded-xl bg-yellow-700 hover:bg-yellow-600 transition flex flex-col items-center gap-1">
+            <i class="fas fa-mountain text-white text-xl"></i>
+            <span class="text-xs">تیرێن</span>
+        </button>
+    </div>
+</div>
+
+<!-- Bottom Actions -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[5000] pointer-events-none">
+    <div class="glass p-2.5 rounded-[28px] flex items-center gap-2 pointer-events-auto shadow-2xl">
+        <button onclick="locateUser()" class="w-14 h-14 rounded-[20px] bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-xl text-white shadow-lg transition active:scale-90">
+            <i class="fas fa-location-crosshairs"></i>
+        </button>
+        <div class="w-[2px] h-8 bg-white/10"></div>
+        <button onclick="toggleModal('janazaModal')" class="w-14 h-14 rounded-[20px] glass-light hover:bg-white/15 flex items-center justify-center text-xl text-green-400 transition active:scale-90">
+            <i class="fas fa-book-quran"></i>
+        </button>
+        <button onclick="shareApp()" class="w-14 h-14 rounded-[20px] glass-light hover:bg-white/15 flex items-center justify-center text-xl text-yellow-400 transition active:scale-90">
+            <i class="fas fa-share-nodes"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Detail Card -->
+<div id="detailCard" class="fixed bottom-0 inset-x-0 z-[6000] glass rounded-t-[32px] p-6 transform translate-y-full transition-all duration-500 max-h-[70vh] overflow-y-auto">
+    <div class="w-20 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
+    
+    <button onclick="closeCard()" class="absolute top-6 left-6 w-10 h-10 rounded-xl glass-light flex items-center justify-center hover:bg-white/20 transition">
+        <i class="fas fa-times text-gray-400"></i>
+    </button>
+
+    <div class="flex flex-col items-center mb-6">
+        <div class="relative mb-4">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-xl opacity-40"></div>
+            <div id="cardIcon" class="relative w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full border-4 border-ultra-dark flex items-center justify-center shadow-2xl">
+                <i class="fas fa-mosque text-3xl text-white"></i>
+            </div>
+        </div>
+        
+        <h2 id="cardTitle" class="text-2xl font-black mb-2 text-center">...</h2>
+        <span id="cardDistance" class="hidden px-3 py-1 bg-blue-500/20 border border-blue-500/40 rounded-lg text-blue-300 text-sm font-bold">
+            <i class="fas fa-route ml-1"></i>
+            <span id="cardDistText">0.0 km</span>
+        </span>
+    </div>
+
+    <div id="cardDetails" class="glass-light p-4 rounded-2xl mb-4 hidden">
+        <h3 class="font-bold text-sm mb-2 text-blue-400"><i class="fas fa-info-circle ml-1"></i>زانیاری</h3>
+        <p id="cardDescription" class="text-sm text-gray-300"></p>
+    </div>
+
+    <div id="cardFuneralAlert" class="hidden glass-light p-5 rounded-2xl mb-6 border-r-4 border-red-500">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center">
+                <i class="fas fa-hands-praying text-white text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-red-200 text-sm mb-1"><i class="fas fa-exclamation-circle ml-1"></i>ئاگاداری پرسە</h3>
+                <p id="cardDeadName" class="text-white font-bold">...</p>
+                <p id="cardPrayerTime" class="text-gray-400 text-sm"><i class="fas fa-clock ml-1"></i>...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+        <button onclick="startNavigation()" class="bg-gradient-to-r from-blue-600 to-blue-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg">
+            <i class="fas fa-location-arrow"></i>ڕێگا
+        </button>
+        <button onclick="shareLocation()" class="glass-light py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+            <i class="fas fa-share-nodes"></i>هاوبەش
+        </button>
+    </div>
+</div>
+
+<!-- Stats Modal -->
+<div id="statsModal" class="modal-container" onclick="if(event.target==this) toggleModal('statsModal')">
+    <div class="glass w-full max-w-lg rounded-[32px] p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-black">ئامار</h2>
+            <button onclick="toggleModal('statsModal')" class="w-10 h-10 rounded-xl glass-light flex items-center justify-center">
+                <i class="fas fa-times text-gray-400"></i>
+            </button>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="glass-light p-4 rounded-2xl">
+                <i class="fas fa-mosque text-4xl text-yellow-400 mb-2"></i>
+                <p class="text-3xl font-black" id="totalMosques">0</p>
+                <p class="text-xs text-gray-400">کۆی مزگەوت</p>
+            </div>
+            <div class="glass-light p-4 rounded-2xl">
+                <i class="fas fa-hands-praying text-4xl text-red-400 mb-2"></i>
+                <p class="text-3xl font-black" id="activeFunerals">0</p>
+                <p class="text-xs text-gray-400">پرسە چالاک</p>
+            </div>
+            <div class="glass-light p-4 rounded-2xl">
+                <i class="fas fa-users text-4xl text-blue-400 mb-2"></i>
+                <p class="text-3xl font-black">324</p>
+                <p class="text-xs text-gray-400">سەردان</p>
+            </div>
+            <div class="glass-light p-4 rounded-2xl">
+                <i class="fas fa-map-marked-alt text-4xl text-green-400 mb-2"></i>
+                <p class="text-3xl font-black" id="nearbyCount">0</p>
+                <p class="text-xs text-gray-400">مزگەوتی نزیک</p>
+            </div>
+        </div>
+        <div class="glass-light p-5 rounded-2xl">
+            <h3 class="font-bold text-sm mb-4 text-blue-400"><i class="fas fa-list-ul ml-1"></i>پرسەکانی ئەمڕۆ</h3>
+            <div id="todayFuneralsList" class="space-y-2"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Prayer Modal -->
+<div id="prayerModal" class="modal-container" onclick="if(event.target==this) toggleModal('prayerModal')">
+    <div class="glass w-full max-w-md rounded-[32px] p-8 shadow-2xl text-center">
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-2xl">
+            <i class="fas fa-clock text-3xl text-white"></i>
+        </div>
+        <h2 class="text-2xl font-black mb-4">کاتی نوێژ</h2>
+        <div id="currentTime" class="mb-6">
+            <div class="text-lg font-mono font-bold">--:--:--</div>
+            <div class="text-xs text-gray-400 mt-1">بارکردن...</div>
+        </div>
+        <div id="prayerList" class="space-y-3"></div>
+        <button onclick="toggleModal('prayerModal')" class="mt-8 text-gray-500 text-sm">داخستن</button>
+    </div>
+</div>
+
+<!-- Janaza Modal -->
+<div id="janazaModal" class="modal-container" onclick="if(event.target==this) toggleModal('janazaModal')">
+    <div class="glass w-full max-w-lg rounded-[32px] p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-black flex items-center gap-2">
+                <i class="fas fa-book-quran text-green-400"></i>نوێژی جەنازە
+            </h2>
+            <button onclick="toggleModal('janazaModal')" class="w-10 h-10 rounded-xl glass-light flex items-center justify-center">
+                <i class="fas fa-times text-gray-400"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-4 text-sm">
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">١</span>
+                    </div>
+                    <h3 class="font-bold text-blue-400">تەکبیری یەکەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto">الله أَكْبَر</span>
+                </div>
+                <p class="text-gray-300 mb-2 mr-13">خوێندنی سورەتی الفاتحة وەکو نوێژی ئادە:</p>
+                <p class="italic text-blue-200 text-[13px] leading-loose mr-13 text-justify" style="line-height: 2;">
+                    ﴿بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ ﴿١﴾ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ ﴿٢﴾ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ ﴿٣﴾ مَـٰلِكِ یَوۡمِ ٱلدِّینِ ﴿٤﴾ إِیَّاكَ نَعۡبُدُ وَإِیَّاكَ نَسۡتَعِینُ ﴿٥﴾ ٱهۡدِنَا ٱلصِّرَ ٰ⁠طَ ٱلۡمُسۡتَقِیمَ ﴿٦﴾ صِرَ ٰ⁠طَ ٱلَّذِینَ أَنۡعَمۡتَ عَلَیۡهِمۡ غَیۡرِ ٱلۡمَغۡضُوبِ عَلَیۡهِمۡ وَلَا ٱلضَّاۤلِّینَ ﴿٧﴾﴾
+                </p>
+                <div class="mt-3 p-3 bg-blue-900/20 rounded-lg">
+                    <p class="text-xs text-blue-300"><i class="fas fa-info-circle ml-1"></i>پێش تەکبیر دەڵێیت: "الله أَكْبَر" و ئینجا ئەم سورەتە دەخوێنیت.</p>
+                </div>
+            </div>
+
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">٢</span>
+                    </div>
+                    <h3 class="font-bold text-blue-400">تەکبیری دووەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto">الله أَكْبَر</span>
+                </div>
+                <p class="text-gray-300 mb-2 mr-13">خوێندنی سەڵاواتی ئیبراهیمی (دروستی بەسەر محمد ﷺ):</p>
+                <p class="italic text-blue-200 text-[13px] leading-loose mr-13 text-justify" style="line-height: 2;">
+                    اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ<br>
+                    اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ
+                </p>
+                <div class="mt-3 p-3 bg-blue-900/20 rounded-lg">
+                    <p class="text-xs text-blue-300"><i class="fas fa-info-circle ml-1"></i>پێش تەکبیری دووەم: "الله أَكْبَر" و ئینجا ئەم سەڵاواتە دەخوێنیت.</p>
+                </div>
+            </div>
+
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-green-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">٣</span>
+                    </div>
+                    <h3 class="font-bold text-green-400">تەکبیری سێیەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto">الله أَكْбр</span>
+                </div>
+                <p class="text-gray-300 mb-2 mr-13">دوعای مردوو (بۆ پیاو):</p>
+                <p class="italic text-green-200 text-[13px] leading-loose mr-13 text-justify" style="line-height: 2;">
+                    اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ، وَعَافِهِ وَاعْفُ عَنْهُ، وَأَكْرِمْ نُزُلَهُ، وَوَسِّعْ مُدْخَلَهُ، وَاغْسِلْهُ بِالْمَاءِ وَالثَّلْجِ وَالْبَرَدِ، وَنَقِّهِ مِنَ الْخَطَايَا كَمَا نَقَّيْتَ الثَّوْبَ الأَبْيَضَ مِنَ الدَّنَسِ، وَأَبْدِلْهُ دَارًا خَيْرًا مِنْ دَارِهِ، وَأَهْلًا خَيْرًا مِنْ أَهْلِهِ، وَزَوْجًا خَيْرًا مِنْ زَوْجِهِ، وَأَدْخِلْهُ الْجَنَّةَ، وَأَعِذْهُ مِنْ عَذَابِ الْقَبْرِ وَعَذَابِ النَّارِ
+                </p>
+                
+                <div class="mt-4 p-4 bg-green-900/20 rounded-lg">
+                    <h4 class="font-bold text-green-300 text-sm mb-2">گۆڕانکاری بۆ ژن و منداڵ:</h4>
+                    <ul class="text-xs text-green-200 space-y-1 mr-4">
+                        <li><span class="font-bold">بۆ ژن:</span> دەڵێیت <span class="italic">"اللَّهُمَّ اغْفِرْ <span class="text-yellow-300">لَهَا</span> وَارْحَمْ<span class="text-yellow-300">هَا</span>"</span></li>
+                        <li><span class="font-bold">بۆ منداڵ:</span> دەڵێیت <span class="italic">"اللَّهُمَّ اجْعَلْهُ فَرَطًا لِوَالِدَيْهِ وَسَبَبًا فِي شَفَاعَتِهِمَا"</span></li>
+                        <li><span class="font-bold">بۆ کۆمەڵ:</span> دەڵێیت <span class="italic">"اللَّهُمَّ اغْفِرْ لَهُمْ وَارْحَمْهُمْ"</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">٤</span>
+                    </div>
+                    <h3 class="font-bold text-blue-400">تەکبیری چوارەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto">الله أَكْبَر</span>
+                </div>
+                <p class="text-gray-300 mb-2 mr-13">دوعای کۆتایی و سەلام:</p>
+                <p class="italic text-blue-200 text-[13px] leading-loose mr-13 text-justify" style="line-height: 2;">
+                    اللَّهُمَّ لا تَحْرِمْنَا أَجْرَهُ، وَلا تَفْتِنَّا بَعْدَهُ، وَاغْفِرْ لَنَا وَلَهُ<br><br>
+                    <span class="text-yellow-300 block mt-2">سەلامەکە:</span>
+                    <span class="text-white">السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ</span>
+                </p>
+                
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div class="bg-blue-900/30 p-3 rounded-xl">
+                        <h4 class="text-xs font-bold text-blue-300 mb-1">شێوازی یەکەم:</h4>
+                        <p class="text-[11px] text-gray-300">سەلام لە ڕاستەوە یەک جار دەدەیتەوە</p>
+                    </div>
+                    <div class="bg-purple-900/30 p-3 rounded-xl">
+                        <h4 class="text-xs font-bold text-purple-300 mb-1">شێوازی دووەم:</h4>
+                        <p class="text-[11px] text-gray-300">سەلام لە ڕاست و چەپەوە دەدەیتەوە</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- دوعا و تەسبیحی کۆتایی -->
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-purple-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-hands-praying text-white"></i>
+                    </div>
+                    <h3 class="font-bold text-purple-400">دوعا و تەسبیحی دوای نوێژ</h3>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="p-3 bg-purple-900/20 rounded-lg">
+                        <h4 class="text-xs font-bold text-purple-300 mb-1">دوعای کۆتایی:</h4>
+                        <p class="italic text-purple-200 text-[12px] leading-relaxed">
+                            سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ، وَسَلَامٌ عَلَى الْمُرْسَلِينَ، وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ
+                        </p>
+                    </div>
+                    
+                    <div class="p-3 bg-emerald-900/20 rounded-lg">
+                        <h4 class="text-xs font-bold text-emerald-300 mb-1">تەسبیحی ڕاستەقینە:</h4>
+                        <p class="text-emerald-200 text-[12px]">
+                            دەڵێیت: <span class="italic">"سُبْحَانَ اللَّهِ"</span> ٣٣ جار<br>
+                            دەڵێیت: <span class="italic">"الْحَمْدُ لِلَّهِ"</span> ٣٣ جار<br>
+                            دەڵێیت: <span class="italic">"اللَّهُ أَكْبَرُ"</span> ٣٣ جار<br>
+                            کۆتایی: <span class="italic">"لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ"</span>
+                        </p>
+                    </div>
+                    
+                    <div class="p-3 bg-amber-900/20 rounded-lg">
+                        <h4 class="text-xs font-bold text-amber-300 mb-1">دوعای خێر:</h4>
+                        <p class="text-amber-200 text-[12px] italic">
+                            اللَّهُمَّ أَجِرْنِي فِي مُصِيبَتِي، وَاخْلُفْ لِي خَيْرًا مِنْهَا
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تێبینی و فەرمانەکان -->
+            <div class="glass-light p-4 rounded-2xl bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700">
+                <h4 class="font-bold text-yellow-400 text-sm mb-3 flex items-center gap-2">
+                    <i class="fas fa-lightbulb"></i>فەرمان و تێبینیە گرنگەکان
+                </h4>
+                <ul class="text-xs text-gray-300 space-y-2 mr-4">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>نوێژی جەنازە <span class="text-yellow-300">چوار تەکبیر</span> و <span class="text-yellow-300">سێ تەکبیر</span> هەیە، ئەمە چوار تەکبیرە.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>نوێژ <span class="text-yellow-300">بەهەموو قورئانێک</span> بکرێت دەتوانیت، تەنها سوورەتی فاتحە لەسەر هەمووان واجبە.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>ئیمام لە <span class="text-yellow-300">سەری مردوو</span> دادەنیشت (پیاو لە سەری، ژن لە ناوەڕاستی).</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>نوێژی جەنازە <span class="text-yellow-300">لەسەر زەوی پاک</span> یان لەسەر حەسیر دەکرێت، لە ناو مزگەوتدا ناکرێت.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>ئەگەر <span class="text-yellow-300">نزیکترین خزم</span> بێت، لە پێشەوەی ئیمام دادەنیشت.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>دوای تەواوبوونی نوێژ، <span class="text-yellow-300">نەکوترا</span> و دەست مەکێشە بەسەر مردوودا.</span>
+                    </li>
+                </ul>
+                
+                <div class="mt-3 p-3 bg-black/40 rounded-lg">
+                    <p class="text-xs text-center text-gray-400">
+                        <i class="fas fa-info-circle ml-1"></i>
+                        ئەم دوعایانە بەپێی سوننەتی پێغەمبەر ﷺ و فەرموودەی دەستەڵاتدارانە
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="toggleModal('janazaModal')" class="w-full mt-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold shadow-lg hover:opacity-90 transition">
+            <i class="fas fa-times-circle ml-1"></i>داخستن
+        </button>
+    </div>
+</div>
+
+<!-- Admin Modal -->
+<div id="adminModal" class="modal-container" onclick="if(event.target==this) toggleModal('adminModal')">
+    <div class="glass w-full max-w-lg rounded-[32px] p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-black"><i class="fas fa-shield-alt text-blue-400 ml-2"></i>ئەدمین</h2>
+            <button onclick="toggleModal('adminModal')" class="w-10 h-10 rounded-xl glass-light flex items-center justify-center">
+                <i class="fas fa-times text-gray-400"></i>
+            </button>
+        </div>
+
+        <!-- Admin Password -->
+        <input type="password" id="adminPass" placeholder="🔒 کۆدی ئەدمین" class="w-full glass-light p-4 rounded-2xl mb-4 outline-none border border-white/10 text-center font-bold placeholder-gray-500">
+
+        <div class="glass-light p-2 rounded-2xl flex gap-2 mb-4">
+            <button onclick="showAdminTab('funeral')" id="tabFuneral" class="flex-1 py-3 rounded-xl bg-red-600 font-bold text-sm">
+                <i class="fas fa-hands-praying ml-1"></i>پرسە
+            </button>
+            <button onclick="showAdminTab('mosque')" id="tabMosque" class="flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm">
+                <i class="fas fa-mosque ml-1"></i>مزگەوت
+            </button>
+        </div>
+
+        <div id="funeralForm" class="space-y-3">
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="font-bold text-sm mb-3 text-red-400"><i class="fas fa-plus-circle ml-1"></i>پرسەی نوێ</h3>
+                <select id="mosqueSelect" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3"></select>
+                <input id="deceasedName" placeholder="ناوی کۆچکردوو" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                <input id="prayerTime" type="time" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                <button onclick="submitFuneral()" class="w-full bg-red-600 py-4 rounded-2xl font-bold">
+                    <i class="fas fa-paper-plane ml-1"></i>بڵاوکردنەوە
+                </button>
+            </div>
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="text-sm font-bold text-red-400 mb-3"><i class="fas fa-list ml-1"></i>پرسە چالاکەکان</h3>
+                <div id="adminFuneralList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+            </div>
+        </div>
+
+        <div id="mosqueForm" class="hidden space-y-3">
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="font-bold text-sm mb-3 text-green-400"><i class="fas fa-plus-circle ml-1"></i>مزگەوتی نوێ</h3>
+                <input id="mosqueName" placeholder="ناوی مزگەوت" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <input id="mosqueLat" placeholder="Lat" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+                    <input id="mosqueLng" placeholder="Lng" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+                </div>
+                <button onclick="useCurrentLocation()" class="w-full bg-blue-600 py-3 rounded-xl text-sm font-bold mb-3">
+                    <i class="fas fa-crosshairs ml-1"></i>شوێنی ئێستا
+                </button>
+                <button onclick="submitMosque()" class="w-full bg-green-600 py-4 rounded-2xl font-bold">
+                    <i class="fas fa-plus ml-1"></i>زیادکردن
+                </button>
+            </div>
+        </div>
+
+        <!-- بۆتی ئەدمین -->
+        <div class="mt-6 pt-4 border-t border-white/10">
+            <h3 class="font-bold text-sm mb-3 text-purple-400">
+                <i class="fas fa-robot ml-1"></i>بۆتی ئەدمین
+            </h3>
+            
+            <div class="glass-light p-3 rounded-2xl mb-3">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">کردارە خێراکان</h4>
+                        <p class="text-xs text-gray-400">هەموو پرسەکان بسڕەوە یان دەستکاری بکە</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="adminBotDeleteAllFunerals()" class="bg-red-600/80 hover:bg-red-600 py-3 rounded-xl text-sm font-bold transition">
+                        <i class="fas fa-trash ml-1"></i>سڕینەوەی هەموو پرسەکان
+                    </button>
+                    <button onclick="adminBotAddSampleFunerals()" class="bg-blue-600/80 hover:bg-blue-600 py-3 rounded-xl text-sm font-bold transition">
+                        <i class="fas fa-plus ml-1"></i>پرسەی نموونەیی
+                    </button>
+                    <button onclick="adminBotResetMosques()" class="bg-yellow-600/80 hover:bg-yellow-600 py-3 rounded-xl text-sm font-bold transition">
+                        <i class="fas fa-sync-alt ml-1"></i>ڕێکخستنەوەی مزگەوتەکان
+                    </button>
+                    <button onclick="adminBotExportData()" class="bg-green-600/80 hover:bg-green-600 py-3 rounded-xl text-sm font-bold transition">
+                        <i class="fas fa-download ml-1"></i>هەناردەی داتا
+                    </button>
+                </div>
+                
+                <div class="mt-4 p-3 bg-black/30 rounded-xl">
+                    <label class="text-xs text-gray-400 block mb-1">ڕێژەی تەواوی دوعاکان:</label>
+                    <div class="w-full bg-white/10 rounded-full h-2">
+                        <div id="prayerProgress" class="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                    <p class="text-xs text-green-400 mt-1 text-center">100% تەواوکراو</p>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="toggleModal('adminModal')" class="w-full mt-4 py-4 glass-light rounded-2xl font-bold">
+            داخستن
+        </button>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toastNotif" class="toast-container">
+    <div class="glass px-6 py-3 rounded-2xl flex items-center gap-3 shadow-2xl">
+        <i id="toastIcon" class="fas fa-check-circle text-green-400 text-xl"></i>
+        <span id="toastMessage" class="text-sm font-bold">سەرکەوتوو</span>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAoPWYvcDV875kkrU2Op7kSUV2GGmqdUkA",
+        authDomain: "hajiawa-map-6fca6.firebaseapp.com",
+        databaseURL: "https://hajiawa-map-6fca6-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "hajiawa-map-6fca6",
+        storageBucket: "hajiawa-map-6fca6.firebasestorage.app",
+        messagingSenderId: "631946456317",
+        appId: "1:631946456317:web:3e08997a9ec6bd0865a294"
+    };
+
+    let map, db, userMarker, routingControl, currentTileLayer;
+    let mosques = [];
+    let funerals = {};
+    let selectedMosque = null;
+    let userPos = null;
+    let prayerTimes = null;
+
+    // مزگەوتە ڕاستەقینەکانی حاجیاوا - وەک کۆدی سەرەتایی تۆ
+    const BACKUP_MOSQUES = [
+        {id: "m1", name: "مزگەوتی گەورەی حاجیاوا", lat: 36.2369, lng: 44.7869, description: "مزگەوتی گەورەی شار"},
+        {id: "m2", name: "مزگەوتی شەھیدان", lat: 36.2355, lng: 44.7885},
+        {id: "m3", name: "مزگەوتی دابان", lat: 36.2340, lng: 44.7890},
+        {id: "m4", name: "مزگەوتی ماکۆک", lat: 36.2335, lng: 44.7875},
+        {id: "m5", name: "مزگەوتی قەلاوەییان", lat: 36.2320, lng: 44.7860},
+        {id: "m12", name: "مزگەوتی شافعی گەورە", lat: 36.2410, lng: 44.7880},
+        {id: "m21", name: "مزگەوتی نور", lat: 36.2390, lng: 44.7820},
+        {id: "m31", name: "مزگەوتی سەلاحەدین", lat: 36.2340, lng: 44.7850}
+    ];
+
+    window.addEventListener('load', async () => {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            console.log("✅ Firebase");
+            updateLoadStatus("گرێدراوە...");
+        } catch(e) {
+            console.warn("⚠️ Offline");
+            updateLoadStatus("ئۆفلاین...");
+        }
+
+        initMap();
+        await loadMosques();
+        updatePrayerTimes();
+        setInterval(updatePrayerTimes, 60000);
+        setInterval(updateCurrentTimeDisplay, 1000);
+        autoDeleteOldFunerals();
+        
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.display = 'none', 700);
+        }, 2500);
+    });
+
+    function updateLoadStatus(msg) {
+        const el = document.getElementById('loadStatus');
+        if(el) el.textContent = msg;
+    }
+
+    function initMap() {
+        map = L.map('map', {
+            zoomControl: false,
+            attributionControl: false,
+            minZoom: 12,
+            maxZoom: 20
+        }).setView([36.2369, 44.7869], 14);
+
+        const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20});
+        const satelliteLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20});
+        const streetLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {maxZoom: 20});
+        const terrainLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {maxZoom: 20});
+
+        darkLayer.addTo(map);
+        currentTileLayer = darkLayer;
+
+        window.mapLayers = {dark: darkLayer, satellite: satelliteLayer, street: streetLayer, terrain: terrainLayer};
+        
+        map.locate({setView: true, maxZoom: 15});
+        map.on('locationfound', (e) => {
+            userPos = e.latlng;
+            if(userMarker) map.removeLayer(userMarker);
+            userMarker = L.marker(e.latlng, {
+                icon: L.divIcon({
+                    className: 'bg-transparent',
+                    html: '<div class="user-marker"></div>',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                })
+            }).addTo(map);
+            updateNearbyCount();
+        });
+
+        map.on('locationerror', () => showToast('کێشە لە شوێن', 'error'));
+        map.on('click', (e) => {
+            document.getElementById('mosqueLat').value = e.latlng.lat.toFixed(6);
+            document.getElementById('mosqueLng').value = e.latlng.lng.toFixed(6);
+        });
+    }
+
+    function changeMapStyle(style) {
+        if(currentTileLayer) map.removeLayer(currentTileLayer);
+        const layer = window.mapLayers[style];
+        if(layer) {
+            layer.addTo(map);
+            currentTileLayer = layer;
+            showToast(`گۆڕدرا بۆ ${style}`);
+        }
+        toggleMapStyleMenu();
+    }
+
+    function toggleMapStyleMenu() {
+        const menu = document.getElementById('mapStyleMenu');
+        menu.classList.toggle('hidden');
+    }
+
+    async function loadMosques() {
+        try {
+            // Fetch from OSM
+            const query = `[out:json];node["amenity"="place_of_worship"]["religion"="muslim"](36.21,44.75,36.26,44.83);out;`;
+            let osmMosques = [];
+            
+            try {
+                const res = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:query});
+                const data = await res.json();
+                osmMosques = data.elements.map(e => ({
+                    id: 'osm_' + e.id,
+                    name: e.tags['name:ckb'] || e.tags.name || 'مزگەوت',
+                    lat: e.lat,
+                    lng: e.lon
+                }));
+            } catch(e) {}
+
+            if(db) {
+                db.ref('customMosques').on('value', (snap) => {
+                    const custom = snap.val() ? Object.values(snap.val()) : [];
+                    const all = [...BACKUP_MOSQUES, ...osmMosques, ...custom];
+                    mosques = all.filter((m, i, a) => a.findIndex(t => t.id === m.id) === i);
+                    renderMarkers();
+                    updateAdminSelect();
+                    updateStats();
+                });
+
+                db.ref('funerals').on('value', (snap) => {
+                    funerals = snap.val() || {};
+                    renderMarkers();
+                    updateStats();
+                    updateHeaderBadge();
+                    updateAdminFuneralList();
+                });
+            } else {
+                mosques = [...BACKUP_MOSQUES, ...osmMosques];
+                renderMarkers();
+                updateAdminSelect();
+                updateStats();
+            }
+        } catch(e) {
+            mosques = BACKUP_MOSQUES;
+            renderMarkers();
+            updateStats();
+        }
+    }
+
+    function renderMarkers() {
+        map.eachLayer(l => {
+            if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l);
+        });
+
+        mosques.forEach(m => {
+            const hasFun = funerals[m.id];
+            const icon = L.divIcon({
+                className: 'bg-transparent',
+                html: hasFun ? '<div class="marker-funeral"><i class="fas fa-hands-praying"></i></div>' : '<div class="marker-mosque"><i class="fas fa-moon"></i></div>',
+                iconSize: hasFun ? [52,52] : [40,40],
+                iconAnchor: hasFun ? [26,52] : [20,20]
+            });
+            L.marker([m.lat, m.lng], {icon}).addTo(map).on('click', () => openDetailCard(m, hasFun));
+        });
+    }
+
+    function openDetailCard(m, fun) {
+        selectedMosque = m;
+        document.getElementById('cardTitle').textContent = m.name;
+        
+        const iconDiv = document.getElementById('cardIcon');
+        if(fun) {
+            iconDiv.className = 'relative w-20 h-20 bg-gradient-to-br from-red-500 to-red-600 rounded-full border-4 border-ultra-dark flex items-center justify-center shadow-2xl';
+            iconDiv.innerHTML = '<i class="fas fa-hands-praying text-3xl text-white"></i>';
+        } else {
+            iconDiv.className = 'relative w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full border-4 border-ultra-dark flex items-center justify-center shadow-2xl';
+            iconDiv.innerHTML = '<i class="fas fa-mosque text-3xl text-white"></i>';
+        }
+
+        if(userPos) {
+            const dist = (map.distance(userPos, [m.lat, m.lng]) / 1000).toFixed(1);
+            document.getElementById('cardDistText').textContent = dist + ' km';
+            document.getElementById('cardDistance').classList.remove('hidden');
+        } else {
+            document.getElementById('cardDistance').classList.add('hidden');
+        }
+
+        const detDiv = document.getElementById('cardDetails');
+        if(m.description) {
+            detDiv.classList.remove('hidden');
+            document.getElementById('cardDescription').textContent = m.description;
+        } else {
+            detDiv.classList.add('hidden');
+        }
+
+        const alert = document.getElementById('cardFuneralAlert');
+        if(fun) {
+            alert.classList.remove('hidden');
+            document.getElementById('cardDeadName').textContent = fun.name;
+            document.getElementById('cardPrayerTime').textContent = 'کات: ' + fun.time;
+        } else {
+            alert.classList.add('hidden');
+        }
+
+        document.getElementById('detailCard').style.transform = 'translateY(0)';
+        map.flyTo([m.lat, m.lng], 16, {duration: 1.2});
+    }
+
+    function closeCard() {
+        document.getElementById('detailCard').style.transform = 'translateY(100%)';
+        if(routingControl) {
+            map.removeControl(routingControl);
+            routingControl = null;
+        }
+    }
+
+    function startNavigation() {
+        if(!userPos) return showToast('شوێن نەدۆزرایەوە', 'error');
+        if(!selectedMosque) return showToast('هەڵبژێرە', 'error');
+        
+        closeCard();
+        if(routingControl) map.removeControl(routingControl);
+        
+        routingControl = L.Routing.control({
+            waypoints: [L.latLng(userPos.lat, userPos.lng), L.latLng(selectedMosque.lat, selectedMosque.lng)],
+            lineOptions: {styles: [{color: '#3b82f6', opacity: 0.9, weight: 6}]},
+            createMarker: () => null,
+            show: false
+        }).addTo(map);
+        
+        showToast('ڕێگاکێشان دەستی پێکرد');
+    }
+
+    function handleSearch() {
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
+        if(q.length < 2) return;
+        const found = mosques.find(m => m.name.toLowerCase().includes(q));
+        if(found) {
+            map.flyTo([found.lat, found.lng], 17);
+            setTimeout(() => openDetailCard(found, funerals[found.id]), 1500);
+        } else {
+            showToast('نەدۆزرایەوە', 'error');
+        }
+    }
+
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+    }
+
+    function updatePrayerTimes() {
+        // =============================
+        // بەکارهێنانی Adhan.js بۆ کاتی نوێژی ڕاستەقینە - وەک کۆدی تۆ
+        // =============================
+        try {
+            // چێکی بۆ بارکردنی adhan.js
+            if (typeof adhan === "undefined") {
+                throw new Error("adhan.js بار نەکراوە");
+            }
+
+            const coordinates = new adhan.Coordinates(36.49, 44.98); // پۆلێنکردنی حاجیاوا
+
+            const params = adhan.CalculationMethod.MuslimWorldLeague();
+            params.madhab = adhan.Madhab.Shafi; // بەپێی مەزهەبی شافعی
+
+            const date = new Date();
+            const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
+
+            const list = [
+                { name: 'بەیانی', time: prayerTimes.fajr, icon: 'fa-moon', arabic: 'الفجر' },
+                { name: 'خۆرهەڵات', time: prayerTimes.sunrise, icon: 'fa-sun', arabic: 'الشروق' },
+                { name: 'نیوەڕۆ', time: prayerTimes.dhuhr, icon: 'fa-cloud-sun', arabic: 'الظهر' },
+                { name: 'عەسر', time: prayerTimes.asr, icon: 'fa-cloud', arabic: 'العصر' },
+                { name: 'مەغریب', time: prayerTimes.maghrib, icon: 'fa-sunset', arabic: 'المغرب' },
+                { name: 'عیشا', time: prayerTimes.isha, icon: 'fa-moon-stars', arabic: 'العشاء' }
+            ];
+
+            function fmt(d) {
+                return d.toLocaleTimeString('ar-IQ', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZone: 'Asia/Baghdad'
+                });
+            }
+
+            const prayerList = document.getElementById('prayerList');
+            if (!prayerList) return;
+            
+            prayerList.innerHTML = '';
+
+            const currentMinutes = date.getHours() * 60 + date.getMinutes();
+            let nextPrayerFound = false;
+
+            list.forEach(prayer => {
+                const prayerMinutes = prayer.time.getHours() * 60 + prayer.time.getMinutes();
+                const formattedTime = fmt(prayer.time);
+                
+                const isNext = !nextPrayerFound && prayerMinutes > currentMinutes;
+                if(isNext) {
+                    nextPrayerFound = true;
+                    
+                    // نوێژی داهاتوو نیشان بدە لە سەرەوە
+                    const prayerNotif = document.getElementById('prayerNotif');
+                    if(prayerNotif) {
+                        prayerNotif.textContent = prayer.name;
+                        prayerNotif.classList.remove('hidden');
+                    }
+                }
+                
+                // کاتی ماوە
+                let timeRemaining = '';
+                if(prayerMinutes > currentMinutes) {
+                    const remaining = prayerMinutes - currentMinutes;
+                    const hoursRemaining = Math.floor(remaining / 60);
+                    const minutesRemaining = remaining % 60;
+                    timeRemaining = `${hoursRemaining > 0 ? hoursRemaining + 'ک' : ''}${minutesRemaining}خ`;
+                } else if(prayerMinutes < currentMinutes) {
+                    timeRemaining = 'تەواو بوو';
+                }
+
+                prayerList.innerHTML += `
+                    <div class="flex justify-between items-center p-4 rounded-2xl ${isNext ? 'prayer-next' : 'glass-light'} transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-gradient-to-br ${isNext ? 'from-blue-500 to-purple-500' : 'from-white/10 to-white/5'} flex items-center justify-center shadow-lg">
+                                <i class="fas ${prayer.icon} ${isNext ? 'text-white' : 'text-gray-400'}"></i>
+                            </div>
+                            <div>
+                                <span class="font-bold text-sm ${isNext ? 'text-white' : 'text-gray-300'}">${prayer.name}</span>
+                                <span class="block text-[10px] ${isNext ? 'text-blue-300' : 'text-gray-500'} mt-0.5">${prayer.arabic}</span>
+                                ${isNext ? '<span class="block text-xs text-blue-300 mt-0.5">نوێژی داهاتوو</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-mono text-lg font-bold ${isNext ? 'text-blue-200' : 'text-gray-400'} block">${formattedTime}</span>
+                            <span class="text-xs ${isNext ? 'text-blue-300' : 'text-gray-500'} font-mono">${timeRemaining}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // ئەگەر هەموو نوێژەکان تەواو بوون، نوێژی بەیانی دەستپێدەکە
+            if(!nextPrayerFound && document.getElementById('prayerNotif')) {
+                document.getElementById('prayerNotif').textContent = 'بەیانی';
+                document.getElementById('prayerNotif').classList.remove('hidden');
+            }
+
+            // زیادکردنی تێبینی بۆ حاجیاوا
+            const notes = [
+                "کاتی نوێژی حاجیاوا بەپێی حیسابی ڕاستەقینە",
+                "بەپێی پۆلێنکردنی (36.49, 44.98)",
+                "بەپێی مەزهەبی شافعی",
+                "بە پێی هەژماری Muslim World League",
+                "کاتی ناوچەی بەغدا"
+            ];
+            const noteText = notes[Math.floor(Math.random() * notes.length)];
+            
+            const note = document.createElement('div');
+            note.className = 'mt-4 p-3 bg-blue-900/20 rounded-xl border border-blue-800/30';
+            note.innerHTML = `
+                <p class="text-xs text-blue-300 text-center">
+                    <i class="fas fa-map-marker-alt ml-1"></i>
+                    ${noteText}
+                </p>
+            `;
+            prayerList.appendChild(note);
+
+        } catch(error) {
+            console.error("کێشە لە کاتەکانی نوێژ:", error);
+            
+            // بەشی پشتیوانی ئەگەر adhan.js بار نەکرابێت
+            const prayerList = document.getElementById('prayerList');
+            if(prayerList) {
+                prayerList.innerHTML = `
+                    <div class="text-center p-4 text-gray-400">
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xl mb-2"></i>
+                        <p class="text-sm">کێشە لە کاتەکانی نوێژ</p>
+                        <p class="text-xs mt-1">سیستەمی ئۆفلاین</p>
+                    </div>
+                `;
+            }
+        }
+        
+        updateCurrentTimeDisplay();
+    }
+
+    function updateCurrentTimeDisplay() {
+        const now = new Date();
+        const kurdishMonths = ['کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران', 'تەمموز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'];
+        const kurdishDays = ['یەکشەممە', 'دووشەممە', 'سێشەممە', 'چوارشەممە', 'پێنجشەممە', 'هەینی', 'شەممە'];
+        
+        const time = now.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false});
+        const date = `${kurdishDays[now.getDay()]}، ${now.getDate()} ${kurdishMonths[now.getMonth()]}`;
+        
+        const el = document.getElementById('currentTime');
+        if(el) {
+            el.innerHTML = `<div class="text-lg font-mono font-bold">${time}</div><div class="text-xs text-gray-400 mt-1">${date}</div>`;
+        }
+    }
+
+    function updateStats() {
+        document.getElementById('totalMosques').textContent = mosques.length;
+        document.getElementById('activeFunerals').textContent = Object.keys(funerals).length;
+        updateNearbyCount();
+        updateTodayFuneralsList();
+    }
+
+    function updateNearbyCount() {
+        if(!userPos) {
+            document.getElementById('nearbyCount').textContent = '0';
+            return;
+        }
+        const nearby = mosques.filter(m => map.distance(userPos, [m.lat, m.lng]) <= 2000);
+        document.getElementById('nearbyCount').textContent = nearby.length;
+    }
+
+    function updateTodayFuneralsList() {
+        const list = document.getElementById('todayFuneralsList');
+        list.innerHTML = '';
+        const count = Object.keys(funerals).length;
+        if(count === 0) {
+            list.innerHTML = '<p class="text-center text-gray-500 text-sm py-3">هیچ پرسەیەک نییە</p>';
+            return;
+        }
+        Object.entries(funerals).forEach(([id, data]) => {
+            const m = mosques.find(x => x.id == id);
+            if(!m) return;
+            const div = document.createElement('div');
+            div.className = 'glass-light p-3 rounded-xl flex justify-between';
+            div.innerHTML = `<div><p class="text-xs font-bold text-white">${m.name}</p><p class="text-xs text-gray-400">${data.name}</p></div><span class="text-xs text-blue-400 font-mono">${data.time}</span>`;
+            list.appendChild(div);
+        });
+    }
+
+    function updateHeaderBadge() {
+        const count = Object.keys(funerals).length;
+        const badge = document.getElementById('funeralBadge');
+        if(count > 0) {
+            badge.classList.remove('hidden');
+            badge.classList.add('flex');
+            document.getElementById('funeralCount').textContent = count + ' پرسە';
+            document.getElementById('statsNotif').classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+            document.getElementById('statsNotif').classList.add('hidden');
+        }
+    }
+
+    function showAllMosques() {
+        if(mosques.length === 0) return showToast('هیچ مزگەوتێک نییە', 'error');
+        const bounds = L.latLngBounds();
+        mosques.forEach(m => bounds.extend([m.lat, m.lng]));
+        map.fitBounds(bounds, {padding: [50, 50]});
+        showToast(`${mosques.length} مزگەوت`);
+    }
+
+    function showAdminTab(tab) {
+        const ff = document.getElementById('funeralForm');
+        const mf = document.getElementById('mosqueForm');
+        const tf = document.getElementById('tabFuneral');
+        const tm = document.getElementById('tabMosque');
+        
+        if(tab === 'funeral') {
+            ff.classList.remove('hidden');
+            mf.classList.add('hidden');
+            tf.className = 'flex-1 py-3 rounded-xl bg-red-600 font-bold text-sm';
+            tm.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
+        } else {
+            ff.classList.add('hidden');
+            mf.classList.remove('hidden');
+            tf.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
+            tm.className = 'flex-1 py-3 rounded-xl bg-green-600 font-bold text-sm';
+        }
+    }
+
+    function submitFuneral() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        if(!db) return showToast('ئینتەرنێت نییە', 'error');
+        const mid = document.getElementById('mosqueSelect').value;
+        const name = document.getElementById('deceasedName').value.trim();
+        const time = document.getElementById('prayerTime').value;
+        if(!mid || !name || !time) return showToast('پڕبکەرەوە', 'error');
+        
+        db.ref('funerals/' + mid).set({name, time, timestamp: Date.now()});
+        document.getElementById('deceasedName').value = '';
+        document.getElementById('prayerTime').value = '';
+        showToast('بڵاوکرایەوە');
+    }
+
+    function submitMosque() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        if(!db) return showToast('ئینتەرنێت نییە', 'error');
+        const name = document.getElementById('mosqueName').value.trim();
+        const lat = parseFloat(document.getElementById('mosqueLat').value);
+        const lng = parseFloat(document.getElementById('mosqueLng').value);
+        if(!name || isNaN(lat) || isNaN(lng)) return showToast('پڕبکەرەوە', 'error');
+        
+        const ref = db.ref('customMosques').push();
+        ref.set({id: ref.key, name, lat, lng});
+        document.getElementById('mosqueName').value = '';
+        document.getElementById('mosqueLat').value = '';
+        document.getElementById('mosqueLng').value = '';
+        showToast('زیادکرا');
+    }
+
+    function useCurrentLocation() {
+        if(!userPos) return showToast('شوێن نەدۆزرایەوە', 'error');
+        document.getElementById('mosqueLat').value = userPos.lat.toFixed(6);
+        document.getElementById('mosqueLng').value = userPos.lng.toFixed(6);
+        showToast('بەکارهێنرا');
+    }
+
+    function updateAdminSelect() {
+        const s = document.getElementById('mosqueSelect');
+        s.innerHTML = '<option value="">هەڵبژێرە</option>' + mosques.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+    }
+
+    function updateAdminFuneralList() {
+        const list = document.getElementById('adminFuneralList');
+        list.innerHTML = '';
+        const count = Object.keys(funerals).length;
+        if(count === 0) {
+            list.innerHTML = '<div class="text-center text-gray-500 text-xs py-4">هیچ نییە</div>';
+            return;
+        }
+        Object.entries(funerals).forEach(([id, data]) => {
+            const m = mosques.find(x => x.id == id);
+            if(!m) return;
+            const div = document.createElement('div');
+            div.className = 'glass-light p-3 rounded-xl flex justify-between border-r-4 border-red-500/30 mb-2';
+            div.innerHTML = `<div><p class="text-xs font-bold">${m.name}</p><p class="text-xs text-gray-400">${data.name} - ${data.time}</p></div><button onclick="deleteFuneral('${id}')" class="bg-red-500/20 px-3 py-1 rounded-lg text-red-400 text-xs"><i class="fas fa-trash"></i></button>`;
+            list.appendChild(div);
+        });
+    }
+
+    function deleteFuneral(id) {
+        if(!confirm('دڵنیای؟')) return;
+        if(db) {
+            db.ref('funerals/' + id).remove();
+            showToast('سڕایەوە');
+        }
+    }
+
+    function autoDeleteOldFunerals() {
+        if(!db) return;
+        db.ref('funerals').once('value', (s) => {
+            const d = s.val();
+            if(!d) return;
+            const now = Date.now();
+            Object.entries(d).forEach(([id, f]) => {
+                if(now - f.timestamp > 86400000) db.ref('funerals/' + id).remove();
+            });
+        });
+    }
+
+    function locateUser() {
+        map.locate({setView: true, maxZoom: 16});
+        showToast('گەڕان...');
+    }
+
+    function shareLocation() {
+        if(!selectedMosque) return showToast('هەڵبژێرە', 'error');
+        const url = `https://www.google.com/maps/search/?api=1&query=${selectedMosque.lat},${selectedMosque.lng}`;
+        if(navigator.share) {
+            navigator.share({title: selectedMosque.name, url});
+        } else {
+            navigator.clipboard.writeText(url);
+            showToast('کۆپی کرا');
+        }
+    }
+
+    function shareApp() {
+        const url = window.location.href;
+        if(navigator.share) {
+            navigator.share({title: 'Hajiawa Map', url});
+        } else {
+            navigator.clipboard.writeText(url);
+            showToast('کۆپی کرا');
+        }
+    }
+
+    function toggleModal(id) {
+        const m = document.getElementById(id);
+        if(m.style.display === 'flex') {
+            m.style.display = 'none';
+        } else {
+            m.style.display = 'flex';
+            if(id === 'adminModal') {
+                updateAdminSelect();
+                updateAdminFuneralList();
+            }
+        }
+    }
+
+    function showToast(msg, type='success') {
+        const t = document.getElementById('toastNotif');
+        const i = document.getElementById('toastIcon');
+        const m = document.getElementById('toastMessage');
+        
+        i.className = type === 'error' ? 'fas fa-exclamation-circle text-red-400 text-xl' : 'fas fa-check-circle text-green-400 text-xl';
+        m.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // بۆتی ئەدمین
+    function adminBotDeleteAllFunerals() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        if(!confirm('دڵنیای لە سڕینەوەی هەموو پرسەکان؟')) return;
+        
+        if(db) {
+            db.ref('funerals').remove()
+                .then(() => {
+                    showToast('هەموو پرسەکان سڕدرایەوە');
+                    document.getElementById('adminFuneralList').innerHTML = '<div class="text-center text-gray-500 text-xs py-4">هیچ پرسەیەک نییە</div>';
+                })
+                .catch(err => showToast('هەڵە: ' + err.message, 'error'));
+        }
+    }
+
+    function adminBotAddSampleFunerals() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        if(!db) return showToast('ئینتەرنێت نییە', 'error');
+        
+        const sampleFunerals = [
+            {mosqueId: 'm1', name: 'حاجی مستەفا عەلی', time: '14:30'},
+            {mosqueId: 'm2', name: 'شەهید ئەحمەد محەممەد', time: '15:00'},
+            {mosqueId: 'm3', name: 'خاتوو کەمالە عەبدوڵڵا', time: '16:15'}
+        ];
+        
+        sampleFunerals.forEach(f => {
+            db.ref('funerals/' + f.mosqueId).set({
+                name: f.name,
+                time: f.time,
+                timestamp: Date.now(),
+                addedBy: 'bot'
+            });
+        });
+        
+        showToast('٣ پرسەی نموونەیی زیادکرا');
+    }
+
+    function adminBotResetMosques() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        // مزگەوتە ڕاستەقینەکانی حاجیاوا - وەک کۆدی سەرەتایی تۆ
+        const hajiawaMosques = [
+            {id: "m1", name: "مزگەوتی گەورەی حاجیاوا", lat: 36.2369, lng: 44.7869, description: "مزگەوتی گەورەی شار"},
+            {id: "m2", name: "مزگەوتی شەھیدان", lat: 36.2355, lng: 44.7885},
+            {id: "m3", name: "مزگەوتی دابان", lat: 36.2340, lng: 44.7890},
+            {id: "m4", name: "مزگەوتی ماکۆک", lat: 36.2335, lng: 44.7875},
+            {id: "m5", name: "مزگەوتی قەلاوەییان", lat: 36.2320, lng: 44.7860},
+            {id: "m12", name: "مزگەوتی شافعی گەورە", lat: 36.2410, lng: 44.7880},
+            {id: "m21", name: "مزگەوتی نور", lat: 36.2390, lng: 44.7820},
+            {id: "m31", name: "مزگەوتی سەلاحەدین", lat: 36.2340, lng: 44.7850}
+        ];
+        
+        if(db) {
+            // تەنها مزگەوتە ڕاستەقینەکان دادەمەزرێنین
+            const customRef = db.ref('customMosques');
+            customRef.remove(); // سڕینەوەی کۆنەکان
+            
+            // زیادکردنی نوێیەکان
+            hajiawaMosques.forEach(mosque => {
+                const newRef = customRef.push();
+                newRef.set({
+                    id: newRef.key,
+                    name: mosque.name,
+                    lat: mosque.lat,
+                    lng: mosque.lng,
+                    description: mosque.description || "",
+                    isHajiawa: true
+                });
+            });
+            
+            showToast('مزگەوتەکانی حاجیاوا ڕێکخرایەوە');
+        } else {
+            // لە ئۆفلاین
+            mosques = hajiawaMosques;
+            renderMarkers();
+            showToast('مزگەوتەکان ڕێکخران (ئۆفلاین)');
+        }
+    }
+
+    function adminBotExportData() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        const data = {
+            mosques: mosques,
+            funerals: funerals,
+            timestamp: new Date().toLocaleString('ku-IQ'),
+            totalMosques: mosques.length,
+            totalFunerals: Object.keys(funerals).length
+        };
+        
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `hajiawa_data_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        showToast('داتا هەناردەکرا');
+    }
+</script>
+
 </body>
 </html>
