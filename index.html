@@ -456,7 +456,7 @@
             <div class="text-lg font-mono font-bold">--:--:--</div>
             <div class="text-xs text-gray-400 mt-1">بارکردن...</div>
         </div>
-        <div id="prayerList" class="w-full"></div>
+        <div id="prayerList" class="space-y-3"></div>
         <button onclick="toggleModal('prayerModal')" class="mt-8 text-gray-500 text-sm">داخستن</button>
     </div>
 </div>
@@ -842,50 +842,25 @@
 
         // ئەم بەشە بخەرە شوێنی window.addEventListener('load', ...) ی کۆنەکە
     window.addEventListener('load', async () => {
-    console.log("🚀 دەستپێکردن...");
+        console.log("🚀 دەستپێکردنی بارکردنی سیستەم...");
 
-    // فەنکشنی لابردنی سپلاش
-    const removeSplash = () => {
-        const splash = document.getElementById('splashScreen');
-        if(splash) {
-            splash.style.opacity = '0';
-            setTimeout(() => splash.style.display = 'none', 700);
-        }
-    };
+        // فەرمانی لابردنی سپلاش سکرین (بە جیا دەینوسین)
+        const removeSplash = () => {
+            const splash = document.getElementById('splashScreen');
+            if(splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 700);
+            }
+        };
 
-    // ١. سەلامەتی (Safety Timeout): دوای ٤ چرکە هەرچی بوو شاشەکە لاببە
-    setTimeout(removeSplash, 4000);
-
-    try {
-        // ٢. بانگکردنی فەنکشنەکانی کات
-        // تەنانەت ئەگەر ئینتەرنێت نەبێت، ئەم بەشە کار دەکات
-        if (typeof adhan !== 'undefined') {
-            updatePrayerTimes();
-            setInterval(updatePrayerTimes, 60000); // هەموو خولەکێک نوێی بکەرەوە
-        }
-        
-        // کاتژمێری چرکەکان
-        setInterval(updateCurrentTimeDisplay, 1000);
-        updateCurrentTimeDisplay(); // یەکەمجار ڕاستەوخۆ بانگی بکە
-
-        // ٣. بەشی Firebase و نەخشە (ئەمە دەخەینە ناو try/catch دووەم)
-        // بۆ ئەوەی ئەگەر ئینتەرنێت نەبوو، کاتژمێرەکە هەر کار بکات
-        try {
-            initMap(); // گریمان initMap لە شوێنێکی تر پێناسە کراوە
-            // لێرە کۆدی Firebaseـەکەت دێت...
-            // ...
-        } catch (mapError) {
-            console.warn("کێشە لە نەخشە یان داتا:", mapError);
-        }
-
-        // ٤. لابردنی سپلاش بە شێوەی ئاسایی (زووتر لە ٤ چرکە)
-        setTimeout(removeSplash, 1000);
-
-    } catch (globalError) {
-        console.error("هەڵەی گشتی:", globalError);
-        removeSplash(); // لەکاتی هەڵەشدا سپلاشەکە لاببە
-    }
-});
+        // سەلامەتی: دانانی تایمەرێک کە ئەگەر دوای ٥ چرکە بەرنامەکە نەکرایەوە، بە زۆر بیکاتەوە
+        // ئەمە چارەسەری کێشەکەت دەکات
+        setTimeout(() => {
+            console.log("⚠️ کات تەواو بوو (Safety Timeout) - لابردنی شاشە بە زۆر");
+            removeSplash();
+        }, 5000);
 
         try {
             // پشکنین بۆ دڵنیابوون لەوەی کتێبخانەکان بار بوون
@@ -1252,83 +1227,64 @@
     }
 
     function updatePrayerTimes() {
-    // ئەگەر کتێبخانەی Adhan بار نەبوو، واز بێنە (بۆ ئەوەی کۆدەکە نەشکێت)
-    if (typeof adhan === 'undefined') return;
-
-    try {
-        // ١. پۆتانەکانی حاجیاوا
+        // 1. ڕێکخستنی شوێن بۆ حاجیاوا
         const coordinates = new adhan.Coordinates(36.2234, 44.8166);
         const date = new Date();
-        const params = adhan.CalculationMethod.MuslimWorldLeague();
-        params.madhab = adhan.Madhab.Shafi;
         
-        // دەستکاری خولەکەکان (ئەگەر ویستت)
-        params.adjustments = { fajr: 2, dhuhr: 1, asr: 1, maghrib: 2, isha: 1 };
-
+        // 2. میتۆدی هەژمارکردن بۆ عێراق
+        const params = adhan.CalculationMethod.MuslimWorldLeague();
+        params.madhab = adhan.Madhab.Shafi; // مەزهەبی شافیعی
+        
+        // 3. ئیحتیاتەکان بۆ وردبینی (Adjustments)
+        params.adjustments.fajr = 2;      // +2 خولەک
+        params.adjustments.dhuhr = 1;     // +1 خولەک
+        params.adjustments.asr = 1;       // +1 خولەک
+        params.adjustments.maghrib = 2;   // +2 خولەک
+        params.adjustments.isha = 1;      // +1 خولەک
+        
+        // 4. وەرگرتنی کاتەکان
         const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
-
-        // ٢. فۆرماتکردنی کات (١٢:٣٠)
+        
+        // 5. فۆرماتکردنی کات
         function formatPrayerTime(time) {
             let hours = time.getHours();
             let minutes = time.getMinutes();
             minutes = minutes < 10 ? '0' + minutes : minutes;
             return `${hours}:${minutes}`;
         }
-
-        // ٣. لیستەکە
+        
+        // 6. ناونیشانەکان بە کوردی
         const prayerSchedule = [
-            {name: 'بەیانی', time: formatPrayerTime(prayerTimes.fajr), icon: 'fa-moon'},
-            {name: 'خۆرهەڵاتن', time: formatPrayerTime(prayerTimes.sunrise), icon: 'fa-sun'},
-            {name: 'نیوەڕۆ', time: formatPrayerTime(prayerTimes.dhuhr), icon: 'fa-sun'},
-            {name: 'عەسر', time: formatPrayerTime(prayerTimes.asr), icon: 'fa-cloud-sun'},
-            {name: 'مەغریب', time: formatPrayerTime(prayerTimes.maghrib), icon: 'fa-moon'},
-            {name: 'عیشا', time: formatPrayerTime(prayerTimes.isha), icon: 'fa-star'}
+            {name: 'بەیانی', key: 'fajr', time: formatPrayerTime(prayerTimes.fajr), icon: 'fa-moon', arabic: 'الفجر'},
+            {name: 'خۆرهەڵاتن', key: 'sunrise', time: formatPrayerTime(prayerTimes.sunrise), icon: 'fa-sun', arabic: 'الشروق'},
+            {name: 'نیوەڕۆ', key: 'dhuhr', time: formatPrayerTime(prayerTimes.dhuhr), icon: 'fa-cloud-sun', arabic: 'الظهر'},
+            {name: 'عەسر', key: 'asr', time: formatPrayerTime(prayerTimes.asr), icon: 'fa-cloud', arabic: 'العصر'},
+            {name: 'مەغریب', key: 'maghrib', time: formatPrayerTime(prayerTimes.maghrib), icon: 'fa-sunset', arabic: 'المغرب'},
+            {name: 'عیشا', key: 'isha', time: formatPrayerTime(prayerTimes.isha), icon: 'fa-moon-stars', arabic: 'العشاء'}
         ];
-
-        // ٤. دۆزینەوەی شوێنەکە لە HTML (بەپێی کۆدەکەی جەنابت)
+        
+        // 7. نیشاندان لە HTML
         const list = document.getElementById('prayerList');
-        if (!list) return;
-
-        // ٥. دیاریکردنی کاتی ئێستا
+        list.innerHTML = '';
+        
         const now = new Date();
         const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        
+        // بینینی کام نوێژ ئێستایە و کامی داهاتووە
         let currentPrayerIndex = -1;
-
+        let nextPrayerIndex = -1;
+        
         prayerSchedule.forEach((prayer, index) => {
-            const [h, m] = prayer.time.split(':').map(Number);
-            if (h * 60 + m <= currentMinutes) currentPrayerIndex = index;
+            const [hours, minutes] = prayer.time.split(':').map(Number);
+            const prayerMinutes = hours * 60 + minutes;
+            
+            if (prayerMinutes <= currentMinutes) {
+                currentPrayerIndex = index;
+            } else if (nextPrayerIndex === -1 && prayerMinutes > currentMinutes) {
+                nextPrayerIndex = index;
+            }
         });
-
-        // ٦. دروستکردنی HTML
-        let htmlContent = '';
-        prayerSchedule.forEach((prayer, index) => {
-            // ئەگەر کاتی ئەم نوێژە بێت، با ڕەنگی جیاواز بێت
-            let activeStyle = (index === currentPrayerIndex) 
-                ? 'bg-blue-50 border-blue-500 scale-105 shadow-md' 
-                : 'bg-white/50 border-transparent hover:bg-white/80';
-
-            htmlContent += `
-                <div class="flex justify-between items-center p-3 mb-2 rounded-xl border-l-4 transition-all duration-300 ${activeStyle}">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-blue-500">
-                            <i class="fas ${prayer.icon}"></i>
-                        </div>
-                        <span class="font-bold text-gray-700">${prayer.name}</span>
-                    </div>
-                    <div class="text-lg font-mono font-bold text-gray-800" style="direction: ltr;">
-                        ${prayer.time}
-                    </div>
-                </div>
-            `;
-        });
-
-        list.innerHTML = htmlContent;
-
-    } catch (e) {
-        console.error("Prayer time error:", e);
-    }
-}
-
+        
         // دروستکردنی لیست
         prayerSchedule.forEach((prayer, index) => {
             const [hours, minutes] = prayer.time.split(':').map(Number);
@@ -1425,24 +1381,35 @@
     }
 
     function updateCurrentTimeDisplay() {
-    const container = document.getElementById('currentTime');
-    if (!container) return;
-
-    const now = new Date();
-    
-    // کات: 12:45:22
-    const timeString = now.toLocaleTimeString('en-US', { hour12: false });
-    
-    // ڕۆژ: چوارشەممە
-    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const dateString = now.toLocaleDateString('ar-IQ', dateOptions); // یان 'ku-IQ' ئەگەر براوسەر پشتیوانی بکات
-
-    container.innerHTML = `
-        <div class="text-3xl font-mono font-black text-gray-700 tracking-wider">${timeString}</div>
-        <div class="text-sm text-gray-500 mt-1 font-bold">${dateString}</div>
-    `;
-}
-
+        const now = new Date();
+        
+        // ناوی مانگەکان بە کوردی
+        const kurdishMonths = [
+            'کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 
+            'ئایار', 'حوزەیران', 'تەممووز', 'ئاب', 
+            'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'
+        ];
+        
+        // ناوی ڕۆژەکان بە کوردی
+        const kurdishDays = [
+            'یەکشەممە', 'دووشەممە', 'سێشەممە', 'چوارشەممە', 
+            'پێنجشەممە', 'هەینی', 'شەممە'
+        ];
+        
+        // کات بە شێوازی 24 سەعاتی
+        const time24 = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        // کات بە شێوازی 12 سەعاتی بۆ نیشاندان
+        const time12 = now.toLocaleTimeString('ckb-IQ', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
         const dayName = kurdishDays[now.getDay()];
         const monthName = kurdishMonths[now.getMonth()];
         const year = now.getFullYear();
