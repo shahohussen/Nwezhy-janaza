@@ -12,8 +12,8 @@
 <meta name="description" content="سیستەمی زیرەکی نەخشەسازی حاجیاوا - Ultra Supreme Edition">
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <!-- Core Libraries -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -256,6 +256,10 @@
     <div class="loader-supreme mb-6"></div>
     
     <p id="loadStatus" class="text-gray-400 text-sm font-medium">جارکردنی سیستەم...</p>
+    <!-- زیادکردنی دوگمەی تاقیکردنەوە -->
+    <button onclick="skipLoading()" class="mt-6 text-xs text-gray-500 hover:text-gray-300 transition">
+        <i class="fas fa-forward ml-1"></i>تاقیکردنەوەی پشتگرێدان
+    </button>
 </div>
 
 <div id="map"></div>
@@ -481,7 +485,7 @@
                 </div>
                 <p class="text-gray-300 mb-2 prayer-kurdish">خوێندنی سورەتی الفاتحة وەکو نوێژی ئادە:</p>
                 <p class="prayer-arabic text-blue-200 leading-loose text-justify pb-3 border-b border-blue-900/30">
-                    بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿١﴾ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِينَ ﴿٢﴾ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿٣﴾ مَـٰلِكِ يَوۡمِ ٱلدِّينِ ﴿٤﴾ إِيَّاكَ نَعۡبُدُ وَإِيَّاكَ نَسۡتَعِينُ ﴿٥﴾ ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِيمَ ﴿٦﴾ صِرَٰطَ ٱلَّذِينَ أَنۡعَمۡتَ عَلَيۡهِمۡ غَيْرِ ٱلۡمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّالِّينَ ﴿٧﴾
+                    بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿١﴾ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِينَ ﴿٢﴾ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿٣﴾ مَـٰلِكِ يَوۡمِ ٱلدِّينِ ﴿٤﴾ إِيَّاكَ نَعۡبُدُ وَإِيَّاکَ نَسۡتَعِينُ ﴿٥﴾ ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِيمَ ﴿٦﴾ صِرَٰطَ ٱلَّذِينَ أَنۡعَمۡتَ عَلَيۡهِمۡ غَيْرِ ٱلۡمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّالِّينَ ﴿٧﴾
                 </p>
                 <div class="mt-3 p-3 bg-blue-900/20 rounded-lg">
                     <p class="text-xs text-blue-300 prayer-kurdish"><i class="fas fa-info-circle ml-1"></i>پێش تەکبیر دەڵێیت: "الله أَكْبَر" و ئینجا ئەم سورەتە دەخوێنیت.</p>
@@ -688,8 +692,12 @@
             <button onclick="showAdminTab('mosque')" id="tabMosque" class="flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm">
                 <i class="fas fa-mosque ml-1"></i>مزگەوت
             </button>
+            <button onclick="showAdminTab('edit')" id="tabEdit" class="flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm">
+                <i class="fas fa-edit ml-1"></i>دەستکاری
+            </button>
         </div>
 
+        <!-- Funeral Form -->
         <div id="funeralForm" class="space-y-3">
             <div class="glass-light p-4 rounded-2xl">
                 <h3 class="font-bold text-sm mb-3 text-red-400"><i class="fas fa-plus-circle ml-1"></i>پرسەی نوێ</h3>
@@ -706,6 +714,7 @@
             </div>
         </div>
 
+        <!-- Mosque Add Form -->
         <div id="mosqueForm" class="hidden space-y-3">
             <div class="glass-light p-4 rounded-2xl">
                 <h3 class="font-bold text-sm mb-3 text-green-400"><i class="fas fa-plus-circle ml-1"></i>مزگەوتی نوێ</h3>
@@ -723,44 +732,40 @@
             </div>
         </div>
 
-        <!-- بۆتی ئەدمین -->
-        <div class="mt-6 pt-4 border-t border-white/10">
-            <h3 class="font-bold text-sm mb-3 text-purple-400">
-                <i class="fas fa-robot ml-1"></i>بۆتی ئەدمین
-            </h3>
-            
-            <div class="glass-light p-3 rounded-2xl mb-3">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                        <i class="fas fa-robot text-white"></i>
+        <!-- Edit Mosques Form -->
+        <div id="editForm" class="hidden space-y-3">
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="font-bold text-sm mb-3 text-blue-400"><i class="fas fa-edit ml-1"></i>دەستکاری و سڕینەوەی مزگەوت</h3>
+                <p class="text-xs text-gray-400 mb-3">مزگەوتی هەڵبژێرە بۆ دەستکاری یان سڕینەوە</p>
+                <select id="editMosqueSelect" onchange="loadMosqueForEdit()" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                    <option value="">مزگەوتێک هەڵبژێرە...</option>
+                </select>
+                
+                <div id="editMosqueForm" class="hidden">
+                    <input id="editMosqueName" placeholder="ناوی نوێی مزگەوت" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input id="editMosqueLat" placeholder="Lat" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+                        <input id="editMosqueLng" placeholder="Lng" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
                     </div>
-                    <div>
-                        <h4 class="font-bold text-sm">کردارە خێراکان</h4>
-                        <p class="text-xs text-gray-400">هەموو پرسەکان بسڕەوە یان دەستکاری بکە</p>
+                    <textarea id="editMosqueDesc" placeholder="زانیاری زیادە (ئارەزوومەندانە)" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3 text-sm min-h-[80px]"></textarea>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="updateMosque()" class="bg-blue-600 py-4 rounded-2xl font-bold">
+                            <i class="fas fa-save ml-1"></i>نوێکردنەوە
+                        </button>
+                        <button onclick="deleteMosque()" class="bg-red-600 py-4 rounded-2xl font-bold">
+                            <i class="fas fa-trash ml-1"></i>سڕینەوە
+                        </button>
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="adminBotDeleteAllFunerals()" class="bg-red-600/80 hover:bg-red-600 py-3 rounded-xl text-sm font-bold transition">
-                        <i class="fas fa-trash ml-1"></i>سڕینەوەی هەموو پرسەکان
-                    </button>
-                    <button onclick="adminBotAddSampleFunerals()" class="bg-blue-600/80 hover:bg-blue-600 py-3 rounded-xl text-sm font-bold transition">
-                        <i class="fas fa-plus ml-1"></i>پرسەی نموونەیی
-                    </button>
-                    <button onclick="adminBotResetMosques()" class="bg-yellow-600/80 hover:bg-yellow-600 py-3 rounded-xl text-sm font-bold transition">
-                        <i class="fas fa-sync-alt ml-1"></i>ڕێکخستنەوەی مزگەوتەکان
-                    </button>
-                    <button onclick="adminBotExportData()" class="bg-green-600/80 hover:bg-green-600 py-3 rounded-xl text-sm font-bold transition">
-                        <i class="fas fa-download ml-1"></i>هەناردەی داتا
-                    </button>
-                </div>
-                
-                <div class="mt-4 p-3 bg-black/30 rounded-xl">
-                    <label class="text-xs text-gray-400 block mb-1">ڕێژەی تەواوی دوعاکان:</label>
-                    <div class="w-full bg-white/10 rounded-full h-2">
-                        <div id="prayerProgress" class="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full" style="width: 100%"></div>
-                    </div>
-                    <p class="text-xs text-green-400 mt-1 text-center">100% تەواوکراو</p>
+                <div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+                    <h4 class="text-xs font-bold text-blue-300 mb-2">تێبینی:</h4>
+                    <ul class="text-xs text-gray-300 space-y-1">
+                        <li>• تەنها مزگەوتەکانی زیادکراو (Custom) دەتوانرێن دەستکاری بکرێن</li>
+                        <li>• مزگەوتە بنەڕەتییەکانی حاجیاوا ناتوانرێن سڕدرێنەوە</li>
+                        <li>• شوێنی نەخشە کلیک بکە بۆ وەرگرتنی پۆتانەکان</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -780,6 +785,32 @@
 </div>
 
 <script>
+    console.log("=== HAJIAWA ULTRA SUPREME v7.0 ===");
+    console.log("تاقیکردنەوەی بارکردنی هەموو سکریپتەکان...");
+
+    // پشکنینی Leaflet
+    if(typeof L === 'undefined') {
+        console.error("❌ Leaflet بارنەکراوە!");
+        document.getElementById('loadStatus').textContent = "کێشە لە Leaflet";
+    } else {
+        console.log("✅ Leaflet بارکراوە");
+    }
+
+    // پشکنینی Firebase
+    if(typeof firebase === 'undefined') {
+        console.warn("⚠️ Firebase بارنەکراوە، ئۆفلاین مۆد");
+        document.getElementById('loadStatus').textContent = "ئۆفلاین مۆد";
+    } else {
+        console.log("✅ Firebase بارکراوە");
+    }
+
+    // پشکنینی Tailwind
+    if(typeof tailwind === 'undefined') {
+        console.warn("⚠️ Tailwind بارنەکراوە");
+    } else {
+        console.log("✅ Tailwind بارکراوە");
+    }
+
     const firebaseConfig = {
         apiKey: "AIzaSyAoPWYvcDV875kkrU2Op7kSUV2GGmqdUkA",
         authDomain: "hajiawa-map-6fca6.firebaseapp.com",
@@ -810,29 +841,99 @@
     ];
 
     window.addEventListener('load', async () => {
+        console.log("🚀 دەستپێکردنی بارکردنی سیستەم...");
+        
         try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            console.log("✅ Firebase");
-            updateLoadStatus("گرێدراوە...");
+            // زیادکردنی timeout بۆ Firebase
+            const timeoutPromise = new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Firebase timeout')), 10000)
+            );
+            
+            // Firebase v10
+            const firebasePromise = (async () => {
+                const app = firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                console.log("✅ Firebase گرێدراوە!");
+                updateLoadStatus("گرێدراوە...");
+            })();
+            
+            await Promise.race([firebasePromise, timeoutPromise]);
+            
         } catch(e) {
-            console.warn("⚠️ Offline");
+            console.warn("⚠️ Firebase گرێنەخرا، ئۆفلاین دەڕۆین:", e);
             updateLoadStatus("ئۆفلاین...");
+            // زیادکردنی db = null بۆ ئۆفلاین مۆد
+            db = null;
         }
 
+        // دەستپێکردنی نەخشە بێگوێدانە Firebase
         initMap();
-        await loadMosques();
+        
+        // بارکردنی مزگەوتەکان بە شێوەیێک کە لە هەر حاڵەتێکدا بێت
+        setTimeout(() => {
+            loadMosques().catch(e => {
+                console.error("❌ هەڵە لە بارکردنی مزگەوتەکان:", e);
+                // بەکارهێنانی مزگەوتە بنەڕەتییەکان
+                mosques = BACKUP_MOSQUES;
+                renderMarkers();
+                updateStats();
+            });
+        }, 500);
+        
         updatePrayerTimes();
         setInterval(updatePrayerTimes, 60000);
         setInterval(updateCurrentTimeDisplay, 1000);
         autoDeleteOldFunerals();
         
+        // پەنجەمە کردن لە splash screen
         setTimeout(() => {
             const splash = document.getElementById('splashScreen');
             splash.style.opacity = '0';
-            setTimeout(() => splash.style.display = 'none', 700);
+            setTimeout(() => {
+                splash.style.display = 'none';
+                // تاقیکردنەوەی دیاریکردنی کێشە
+                if (mosques.length === 0) {
+                    showToast('سیستەم ئۆفلاینە، مزگەوتە بنەڕەتییەکان بارکران', 'info');
+                }
+            }, 700);
         }, 2500);
     });
+
+    function skipLoading() {
+        console.log("📋 تاقیکردنەوەی پشتگرێدان دەکرێت...");
+        
+        // پەنجەمە کردن لە splash
+        const splash = document.getElementById('splashScreen');
+        splash.style.opacity = '0';
+        
+        // دەستپێکردنی نەخشە بە ڕێکخستنێکی سادە
+        setTimeout(() => {
+            splash.style.display = 'none';
+            
+            if(!map) {
+                initMapSimple();
+            }
+            
+            // بەکارهێنانی مزگەوتە بنەڕەتییەکان
+            mosques = BACKUP_MOSQUES;
+            renderMarkers();
+            updateStats();
+            
+            showToast('سیستەم لە مۆدی تاقیکردنەوەیە', 'info');
+        }, 500);
+    }
+
+    function initMapSimple() {
+        try {
+            map = L.map('map').setView([36.2369, 44.7869], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            showToast('نەخشە بارکرا (مۆدی سادە)', 'info');
+        } catch(e) {
+            console.error("❌ هەڵە لە مۆدی سادەی نەخشە:", e);
+            document.getElementById('map').innerHTML = 
+                '<div class="p-4 text-center"><p class="text-red-400">نەخشە بارنەکرا</p><button onclick="location.reload()" class="mt-2 px-4 py-2 bg-blue-600 rounded">هەوڵی دووبارە</button></div>';
+        }
+    }
 
     function updateLoadStatus(msg) {
         const el = document.getElementById('loadStatus');
@@ -840,43 +941,53 @@
     }
 
     function initMap() {
-        map = L.map('map', {
-            zoomControl: false,
-            attributionControl: false,
-            minZoom: 12,
-            maxZoom: 20
-        }).setView([36.2369, 44.7869], 14);
+        try {
+            map = L.map('map', {
+                zoomControl: false,
+                attributionControl: false,
+                minZoom: 12,
+                maxZoom: 20
+            }).setView([36.2369, 44.7869], 14);
 
-        const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20});
-        const satelliteLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20});
-        const streetLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {maxZoom: 20});
-        const terrainLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {maxZoom: 20});
+            const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20});
+            const satelliteLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20});
+            const streetLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {maxZoom: 20});
+            const terrainLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {maxZoom: 20});
 
-        darkLayer.addTo(map);
-        currentTileLayer = darkLayer;
+            darkLayer.addTo(map);
+            currentTileLayer = darkLayer;
 
-        window.mapLayers = {dark: darkLayer, satellite: satelliteLayer, street: streetLayer, terrain: terrainLayer};
-        
-        map.locate({setView: true, maxZoom: 15});
-        map.on('locationfound', (e) => {
-            userPos = e.latlng;
-            if(userMarker) map.removeLayer(userMarker);
-            userMarker = L.marker(e.latlng, {
-                icon: L.divIcon({
-                    className: 'bg-transparent',
-                    html: '<div class="user-marker"></div>',
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
-                })
-            }).addTo(map);
-            updateNearbyCount();
-        });
+            window.mapLayers = {dark: darkLayer, satellite: satelliteLayer, street: streetLayer, terrain: terrainLayer};
+            
+            map.locate({setView: true, maxZoom: 15});
+            map.on('locationfound', (e) => {
+                userPos = e.latlng;
+                if(userMarker) map.removeLayer(userMarker);
+                userMarker = L.marker(e.latlng, {
+                    icon: L.divIcon({
+                        className: 'bg-transparent',
+                        html: '<div class="user-marker"></div>',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    })
+                }).addTo(map);
+                updateNearbyCount();
+            });
 
-        map.on('locationerror', () => showToast('کێشە لە شوێن', 'error'));
-        map.on('click', (e) => {
-            document.getElementById('mosqueLat').value = e.latlng.lat.toFixed(6);
-            document.getElementById('mosqueLng').value = e.latlng.lng.toFixed(6);
-        });
+            map.on('locationerror', () => showToast('کێشە لە شوێن', 'error'));
+            map.on('click', (e) => {
+                document.getElementById('mosqueLat').value = e.latlng.lat.toFixed(6);
+                document.getElementById('mosqueLng').value = e.latlng.lng.toFixed(6);
+                // بۆ بەشی دەستکاریش
+                document.getElementById('editMosqueLat').value = e.latlng.lat.toFixed(6);
+                document.getElementById('editMosqueLng').value = e.latlng.lng.toFixed(6);
+            });
+        } catch(e) {
+            console.error("❌ هەڵە لە دەستپێکردنی نەخشە:", e);
+            showToast('کێشە لە نەخشەکە', 'error');
+            // دەستپێکردنی جارێکی تر بە ڕێکخستنێکی سادەتر
+            setTimeout(initMapSimple, 1000);
+        }
     }
 
     function changeMapStyle(style) {
@@ -896,49 +1007,96 @@
     }
 
     async function loadMosques() {
+        console.log("🚀 دەستپێکردنی بارکردنی مزگەوتەکان...");
+        
+        // زیادکردنی timeout بۆ OSM
+        const timeoutDuration = 15000; // 15 چرکە
+        
         try {
-            // Fetch from OSM
+            // Fetch from OSM بە timeout
             const query = `[out:json];node["amenity"="place_of_worship"]["religion"="muslim"](36.21,44.75,36.26,44.83);out;`;
             let osmMosques = [];
             
-            try {
-                const res = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:query});
-                const data = await res.json();
+            const osmPromise = fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST', 
+                body: query
+            }).then(res => res.json())
+              .then(data => {
                 osmMosques = data.elements.map(e => ({
                     id: 'osm_' + e.id,
                     name: e.tags['name:ckb'] || e.tags.name || 'مزگەوت',
                     lat: e.lat,
                     lng: e.lon
                 }));
-            } catch(e) {}
+                console.log(`✅ ${osmMosques.length} مزگەوت لە OSM هێنرا`);
+                return osmMosques;
+            }).catch(e => {
+                console.warn("⚠️ OSM کار نەکرد:", e);
+                return [];
+            });
+            
+            // چاوەڕوانی بۆ OSM
+            osmMosques = await Promise.race([
+                osmPromise,
+                new Promise(resolve => setTimeout(() => {
+                    console.log("⏱️ OSM timeout");
+                    resolve([]);
+                }, timeoutDuration))
+            ]);
 
+            // Firebase
             if(db) {
+                console.log("🔥 Firebase بەردەستە، مزگەوتەکان بار دەکرێن...");
+                
+                // زیادکردنی callback بۆ هەڵە
                 db.ref('customMosques').on('value', (snap) => {
-                    const custom = snap.val() ? Object.values(snap.val()) : [];
-                    const all = [...BACKUP_MOSQUES, ...osmMosques, ...custom];
-                    mosques = all.filter((m, i, a) => a.findIndex(t => t.id === m.id) === i);
+                    try {
+                        const custom = snap.val() ? Object.values(snap.val()) : [];
+                        const all = [...BACKUP_MOSQUES, ...osmMosques, ...custom];
+                        mosques = all.filter((m, i, a) => a.findIndex(t => t.id === m.id) === i);
+                        console.log(`🎯 کۆی گشتی: ${mosques.length} مزگەوت`);
+                        renderMarkers();
+                        updateAdminSelect();
+                        updateEditMosqueSelect();
+                        updateStats();
+                    } catch(e) {
+                        console.error("❌ هەڵە لە Firebase customMosques:", e);
+                        mosques = [...BACKUP_MOSQUES, ...osmMosques];
+                        renderMarkers();
+                        updateStats();
+                    }
+                }, (error) => {
+                    console.error("❌ هەڵەی Firebase:", error);
+                    mosques = [...BACKUP_MOSQUES, ...osmMosques];
                     renderMarkers();
-                    updateAdminSelect();
                     updateStats();
                 });
 
                 db.ref('funerals').on('value', (snap) => {
                     funerals = snap.val() || {};
+                    console.log(`⚰️ ${Object.keys(funerals).length} پرسە چالاک`);
                     renderMarkers();
                     updateStats();
                     updateHeaderBadge();
                     updateAdminFuneralList();
                 });
+                
             } else {
+                console.log("📴 Firebase نییە، ئۆفلاین دەڕۆین");
                 mosques = [...BACKUP_MOSQUES, ...osmMosques];
+                console.log(`📱 کۆی گشتی (ئۆفلاین): ${mosques.length} مزگەوت`);
                 renderMarkers();
                 updateAdminSelect();
+                updateEditMosqueSelect();
                 updateStats();
             }
+            
         } catch(e) {
+            console.error("❌ هەڵەی گشتی لە بارکردنی مزگەوتەکان:", e);
             mosques = BACKUP_MOSQUES;
             renderMarkers();
             updateStats();
+            throw e; // هەڵەکە دەرباز بکە بۆ catch ی سەرەکی
         }
     }
 
@@ -1304,19 +1462,31 @@
     function showAdminTab(tab) {
         const ff = document.getElementById('funeralForm');
         const mf = document.getElementById('mosqueForm');
+        const ef = document.getElementById('editForm');
         const tf = document.getElementById('tabFuneral');
         const tm = document.getElementById('tabMosque');
+        const te = document.getElementById('tabEdit');
+        
+        // هەموو تابیەکان بشارەوە
+        ff.classList.add('hidden');
+        mf.classList.add('hidden');
+        ef.classList.add('hidden');
+        
+        // هەموو تابەکان بیکە بە ناچالاک
+        tf.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
+        tm.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
+        te.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
         
         if(tab === 'funeral') {
             ff.classList.remove('hidden');
-            mf.classList.add('hidden');
             tf.className = 'flex-1 py-3 rounded-xl bg-red-600 font-bold text-sm';
-            tm.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
-        } else {
-            ff.classList.add('hidden');
+        } else if(tab === 'mosque') {
             mf.classList.remove('hidden');
-            tf.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
             tm.className = 'flex-1 py-3 rounded-xl bg-green-600 font-bold text-sm';
+        } else if(tab === 'edit') {
+            ef.classList.remove('hidden');
+            te.className = 'flex-1 py-3 rounded-xl bg-blue-600 font-bold text-sm';
+            updateEditMosqueSelect();
         }
     }
 
@@ -1351,14 +1521,14 @@
         document.getElementById('mosqueName').value = '';
         document.getElementById('mosqueLat').value = '';
         document.getElementById('mosqueLng').value = '';
-        showToast('زیادکرا');
+        showToast('مزگەوت زیادکرا');
     }
 
     function useCurrentLocation() {
         if(!userPos) return showToast('شوێن نەدۆزرایەوە', 'error');
         document.getElementById('mosqueLat').value = userPos.lat.toFixed(6);
         document.getElementById('mosqueLng').value = userPos.lng.toFixed(6);
-        showToast('بەکارهێنرا');
+        showToast('شوێنی ئێستا بەکارهێنرا');
     }
 
     function updateAdminSelect() {
@@ -1366,12 +1536,128 @@
         s.innerHTML = '<option value="">هەڵبژێرە</option>' + mosques.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
     }
 
+    function updateEditMosqueSelect() {
+        const s = document.getElementById('editMosqueSelect');
+        // تەنها مزگەوتەکانی زیادکراو (custom) نیشان بدە
+        const customMosques = mosques.filter(m => m.id.startsWith('-') || m.id.includes('custom') || !BACKUP_MOSQUES.find(bm => bm.id === m.id));
+        
+        s.innerHTML = '<option value="">مزگەوتێک هەڵبژێرە...</option>' + 
+            customMosques.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+    }
+
+    function loadMosqueForEdit() {
+        const mosqueId = document.getElementById('editMosqueSelect').value;
+        if(!mosqueId) {
+            document.getElementById('editMosqueForm').classList.add('hidden');
+            return;
+        }
+        
+        const mosque = mosques.find(m => m.id === mosqueId);
+        if(!mosque) return;
+        
+        document.getElementById('editMosqueName').value = mosque.name || '';
+        document.getElementById('editMosqueLat').value = mosque.lat || '';
+        document.getElementById('editMosqueLng').value = mosque.lng || '';
+        document.getElementById('editMosqueDesc').value = mosque.description || '';
+        
+        document.getElementById('editMosqueForm').classList.remove('hidden');
+    }
+
+    function updateMosque() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        if(!db) return showToast('ئینتەرنێت نییە', 'error');
+        
+        const mosqueId = document.getElementById('editMosqueSelect').value;
+        if(!mosqueId) return showToast('مزگەوتێک هەڵبژێرە', 'error');
+        
+        // پشکنین بکە ئایە مزگەوتێکی زیادکراوە یان نا
+        const isCustom = mosqueId.startsWith('-') || mosqueId.includes('custom') || !BACKUP_MOSQUES.find(m => m.id === mosqueId);
+        if(!isCustom) return showToast('تەنها مزگەوتە زیادکراوەکان دەتوانرێن دەستکاری بکرێن', 'error');
+        
+        const name = document.getElementById('editMosqueName').value.trim();
+        const lat = parseFloat(document.getElementById('editMosqueLat').value);
+        const lng = parseFloat(document.getElementById('editMosqueLng').value);
+        const description = document.getElementById('editMosqueDesc').value.trim();
+        
+        if(!name || isNaN(lat) || isNaN(lng)) return showToast('پڕبکەرەوە', 'error');
+        
+        // بینی ئایە لە Firebase-ە یان لە لیستی ئۆفلاین
+        if(db) {
+            // لە Firebase دەستکاری بکە
+            db.ref('customMosques').orderByChild('id').equalTo(mosqueId).once('value', (snapshot) => {
+                if(snapshot.exists()) {
+                    const key = Object.keys(snapshot.val())[0];
+                    db.ref('customMosques/' + key).update({
+                        name: name,
+                        lat: lat,
+                        lng: lng,
+                        description: description
+                    });
+                    showToast('مزگەوت نوێکرایەوە');
+                } else {
+                    showToast('مزگەوت نەدۆزرایەوە', 'error');
+                }
+            });
+        } else {
+            // لە لیستی ئۆفلاین دەستکاری بکە
+            const index = mosques.findIndex(m => m.id === mosqueId);
+            if(index !== -1) {
+                mosques[index].name = name;
+                mosques[index].lat = lat;
+                mosques[index].lng = lng;
+                mosques[index].description = description;
+                renderMarkers();
+                showToast('مزگەوت نوێکرایەوە (ئۆفلاین)');
+            }
+        }
+    }
+
+    function deleteMosque() {
+        const pass = document.getElementById('adminPass').value;
+        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
+        
+        if(!confirm('دڵنیای لە سڕینەوەی ئەم مزگەوتە؟')) return;
+        
+        const mosqueId = document.getElementById('editMosqueSelect').value;
+        if(!mosqueId) return showToast('مزگەوتێک هەڵبژێرە', 'error');
+        
+        // پشکنین بکە ئایە مزگەوتێکی زیادکراوە یان نا
+        const isCustom = mosqueId.startsWith('-') || mosqueId.includes('custom') || !BACKUP_MOSQUES.find(m => m.id === mosqueId);
+        if(!isCustom) return showToast('تەنها مزگەوتە زیادکراوەکان دەتوانرێن سڕدرێنەوە', 'error');
+        
+        if(db) {
+            // لە Firebase بسڕەوە
+            db.ref('customMosques').orderByChild('id').equalTo(mosqueId).once('value', (snapshot) => {
+                if(snapshot.exists()) {
+                    const key = Object.keys(snapshot.val())[0];
+                    db.ref('customMosques/' + key).remove()
+                        .then(() => {
+                            showToast('مزگەوت سڕدرایەوە');
+                            document.getElementById('editMosqueForm').classList.add('hidden');
+                            document.getElementById('editMosqueSelect').value = '';
+                        })
+                        .catch(err => showToast('هەڵە: ' + err.message, 'error'));
+                }
+            });
+        } else {
+            // لە لیستی ئۆفلاین بسڕەوە
+            mosques = mosques.filter(m => m.id !== mosqueId);
+            renderMarkers();
+            updateEditMosqueSelect();
+            document.getElementById('editMosqueForm').classList.add('hidden');
+            document.getElementById('editMosqueSelect').value = '';
+            showToast('مزگەوت سڕدرایەوە (ئۆفلاین)');
+        }
+    }
+
     function updateAdminFuneralList() {
         const list = document.getElementById('adminFuneralList');
         list.innerHTML = '';
         const count = Object.keys(funerals).length;
         if(count === 0) {
-            list.innerHTML = '<div class="text-center text-gray-500 text-xs py-4">هیچ نییە</div>';
+            list.innerHTML = '<div class="text-center text-gray-500 text-xs py-4">هیچ پرسەیەک نییە</div>';
             return;
         }
         Object.entries(funerals).forEach(([id, data]) => {
@@ -1388,7 +1674,7 @@
         if(!confirm('دڵنیای؟')) return;
         if(db) {
             db.ref('funerals/' + id).remove();
-            showToast('سڕایەوە');
+            showToast('پرسە سڕدرایەوە');
         }
     }
 
@@ -1406,27 +1692,27 @@
 
     function locateUser() {
         map.locate({setView: true, maxZoom: 16});
-        showToast('گەڕان...');
+        showToast('گەڕان بۆ شوێنەکەت...');
     }
 
     function shareLocation() {
-        if(!selectedMosque) return showToast('هەڵبژێرە', 'error');
+        if(!selectedMosque) return showToast('مزگەوتێک هەڵبژێرە', 'error');
         const url = `https://www.google.com/maps/search/?api=1&query=${selectedMosque.lat},${selectedMosque.lng}`;
         if(navigator.share) {
             navigator.share({title: selectedMosque.name, url});
         } else {
             navigator.clipboard.writeText(url);
-            showToast('کۆپی کرا');
+            showToast('لینکی شوێن کۆپی کرا');
         }
     }
 
     function shareApp() {
         const url = window.location.href;
         if(navigator.share) {
-            navigator.share({title: 'Hajiawa Map', url});
+            navigator.share({title: 'نەخشەی زیرەکی حاجیاوا', url});
         } else {
             navigator.clipboard.writeText(url);
-            showToast('کۆپی کرا');
+            showToast('لینکی ئەپ کۆپی کرا');
         }
     }
 
@@ -1452,115 +1738,6 @@
         m.textContent = msg;
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    // بۆتی ئەدمین
-    function adminBotDeleteAllFunerals() {
-        const pass = document.getElementById('adminPass').value;
-        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
-        
-        if(!confirm('دڵنیای لە سڕینەوەی هەموو پرسەکان؟')) return;
-        
-        if(db) {
-            db.ref('funerals').remove()
-                .then(() => {
-                    showToast('هەموو پرسەکان سڕدرایەوە');
-                    document.getElementById('adminFuneralList').innerHTML = '<div class="text-center text-gray-500 text-xs py-4">هیچ پرسەیەک نییە</div>';
-                })
-                .catch(err => showToast('هەڵە: ' + err.message, 'error'));
-        }
-    }
-
-    function adminBotAddSampleFunerals() {
-        const pass = document.getElementById('adminPass').value;
-        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
-        
-        if(!db) return showToast('ئینتەرنێت نییە', 'error');
-        
-        const sampleFunerals = [
-            {mosqueId: 'm1', name: 'حاجی مستەفا عەلی', time: '14:30'},
-            {mosqueId: 'm2', name: 'شەهید ئەحمەد محەممەد', time: '15:00'},
-            {mosqueId: 'm3', name: 'خاتوو کەمالە عەبدوڵڵا', time: '16:15'}
-        ];
-        
-        sampleFunerals.forEach(f => {
-            db.ref('funerals/' + f.mosqueId).set({
-                name: f.name,
-                time: f.time,
-                timestamp: Date.now(),
-                addedBy: 'bot'
-            });
-        });
-        
-        showToast('٣ پرسەی نموونەیی زیادکرا');
-    }
-
-    function adminBotResetMosques() {
-        const pass = document.getElementById('adminPass').value;
-        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
-        
-        // مزگەوتە ڕاستەقینەکانی حاجیاوا - وەک کۆدی سەرەتایی تۆ
-        const hajiawaMosques = [
-            {id: "m1", name: "مزگەوتی گەورەی حاجیاوا", lat: 36.2369, lng: 44.7869, description: "مزگەوتی گەورەی شار"},
-            {id: "m2", name: "مزگەوتی شەھیدان", lat: 36.2355, lng: 44.7885},
-            {id: "m3", name: "مزگەوتی دابان", lat: 36.2340, lng: 44.7890},
-            {id: "m4", name: "مزگەوتی ماکۆک", lat: 36.2335, lng: 44.7875},
-            {id: "m5", name: "مزگەوتی قەلاوەییان", lat: 36.2320, lng: 44.7860},
-            {id: "m12", name: "مزگەوتی شافعی گەورە", lat: 36.2410, lng: 44.7880},
-            {id: "m21", name: "مزگەوتی نور", lat: 36.2390, lng: 44.7820},
-            {id: "m31", name: "مزگەوتی سەلاحەدین", lat: 36.2340, lng: 44.7850}
-        ];
-        
-        if(db) {
-            // تەنها مزگەوتە ڕاستەقینەکان دادەمەزرێنین
-            const customRef = db.ref('customMosques');
-            customRef.remove(); // سڕینەوەی کۆنەکان
-            
-            // زیادکردنی نوێیەکان
-            hajiawaMosques.forEach(mosque => {
-                const newRef = customRef.push();
-                newRef.set({
-                    id: newRef.key,
-                    name: mosque.name,
-                    lat: mosque.lat,
-                    lng: mosque.lng,
-                    description: mosque.description || "",
-                    isHajiawa: true
-                });
-            });
-            
-            showToast('مزگەوتەکانی حاجیاوا ڕێکخرایەوە');
-        } else {
-            // لە ئۆفلاین
-            mosques = hajiawaMosques;
-            renderMarkers();
-            showToast('مزگەوتەکان ڕێکخران (ئۆفلاین)');
-        }
-    }
-
-    function adminBotExportData() {
-        const pass = document.getElementById('adminPass').value;
-        if(pass !== '2026') return showToast('کۆدی ئەدمین هەڵەیە', 'error');
-        
-        const data = {
-            mosques: mosques,
-            funerals: funerals,
-            timestamp: new Date().toLocaleString('ku-IQ'),
-            totalMosques: mosques.length,
-            totalFunerals: Object.keys(funerals).length
-        };
-        
-        const dataStr = JSON.stringify(data, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
-        const exportFileDefaultName = `hajiawa_data_${new Date().toISOString().split('T')[0]}.json`;
-        
-        const linkElement = document.createElement('a');
-        linkElement.setAttribute('href', dataUri);
-        linkElement.setAttribute('download', exportFileDefaultName);
-        linkElement.click();
-        
-        showToast('داتا هەناردەکرا');
     }
 </script>
 
