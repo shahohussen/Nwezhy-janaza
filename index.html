@@ -1227,98 +1227,63 @@
     }
 
     function updatePrayerTimes() {
-    // پشکنین بۆ بوونی کتێبخانەکە
-    if (typeof adhan === 'undefined') return;
-
-    // 1. ڕێکخستنی شوێن بۆ حاجیاوا
-    const coordinates = new adhan.Coordinates(36.2234, 44.8166);
-    const date = new Date();
-    
-    // 2. میتۆدی هەژمارکردن
-    const params = adhan.CalculationMethod.MuslimWorldLeague();
-    params.madhab = adhan.Madhab.Shafi;
-    
-    // 3. ئیحتیاتەکان (Adjustments)
-    params.adjustments.fajr = 2;
-    params.adjustments.dhuhr = 1;
-    params.adjustments.asr = 1;
-    params.adjustments.maghrib = 2;
-    params.adjustments.isha = 1;
-    
-    // 4. وەرگرتنی کاتەکان
-    const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
-    
-    // 5. فۆرماتکردنی کات (٢٤ کاتژمێری)
-    function formatPrayerTime(time) {
-        let hours = time.getHours();
-        let minutes = time.getMinutes();
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        // ئەگەر دەتەوێت ١٢ کاتژمێری بێت، لێرە دەبێت دەستکاری بکەیت
-        return `${hours}:${minutes}`;
-    }
-    
-    // 6. لیستەکە
-    const prayerSchedule = [
-        {name: 'بەیانی', key: 'fajr', time: formatPrayerTime(prayerTimes.fajr), icon: 'fa-moon'},
-        {name: 'خۆرهەڵاتن', key: 'sunrise', time: formatPrayerTime(prayerTimes.sunrise), icon: 'fa-sun'},
-        {name: 'نیوەڕۆ', key: 'dhuhr', time: formatPrayerTime(prayerTimes.dhuhr), icon: 'fa-sun'},
-        {name: 'عەسر', key: 'asr', time: formatPrayerTime(prayerTimes.asr), icon: 'fa-cloud-sun'},
-        {name: 'مەغریب', key: 'maghrib', time: formatPrayerTime(prayerTimes.maghrib), icon: 'fa-moon'},
-        {name: 'عیشا', key: 'isha', time: formatPrayerTime(prayerTimes.isha), icon: 'fa-star'}
-    ];
-    
-    // 7. دۆزینەوەی Elementـەکە
-    const list = document.getElementById('prayerList');
-    if (!list) return; // ئەگەر لیستەکە نەبوو، هیچ مەکە
-    
-    list.innerHTML = ''; // پاککردنەوەی لیستی کۆن
-    
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    
-    let currentPrayerIndex = -1;
-    
-    // دیاریکردنی کاتی ئێستا
-    prayerSchedule.forEach((prayer, index) => {
-        const [hours, minutes] = prayer.time.split(':').map(Number);
-        const prayerMinutes = hours * 60 + minutes;
+        // 1. ڕێکخستنی شوێن بۆ حاجیاوا
+        const coordinates = new adhan.Coordinates(36.2234, 44.8166);
+        const date = new Date();
         
-        if (prayerMinutes <= currentMinutes) {
-            currentPrayerIndex = index;
-        }
-    });
-
-    // ==========================================
-    // بەشی گرنگ: دروستکردنی HTML (ئەوەی لە کۆدەکەی تۆدا کەم بوو)
-    // ==========================================
-    let htmlContent = '';
-
-    prayerSchedule.forEach((prayer, index) => {
-        // دیاریکردنی کلاس بۆ ڕەنگکردنی کاتی ئێستا
-        let activeClass = (index === currentPrayerIndex) ? 'bg-green-100 border-l-4 border-green-500' : '';
+        // 2. میتۆدی هەژمارکردن بۆ عێراق
+        const params = adhan.CalculationMethod.MuslimWorldLeague();
+        params.madhab = adhan.Madhab.Shafi; // مەزهەبی شافیعی
         
-        // ئەگەر کاتژمێر ١٢ شەو تێپەڕی، عیشا دەبێتە دوایین نوێژ
-        if (currentPrayerIndex === -1 && index === 5) {
-             // هیچ مەکە یان مامەڵەی تایبەت
+        // 3. ئیحتیاتەکان بۆ وردبینی (Adjustments)
+        params.adjustments.fajr = 2;      // +2 خولەک
+        params.adjustments.dhuhr = 1;     // +1 خولەک
+        params.adjustments.asr = 1;       // +1 خولەک
+        params.adjustments.maghrib = 2;   // +2 خولەک
+        params.adjustments.isha = 1;      // +1 خولەک
+        
+        // 4. وەرگرتنی کاتەکان
+        const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
+        
+        // 5. فۆرماتکردنی کات
+        function formatPrayerTime(time) {
+            let hours = time.getHours();
+            let minutes = time.getMinutes();
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return `${hours}:${minutes}`;
         }
-
-        htmlContent += `
-            <div class="flex justify-between items-center p-3 mb-2 rounded shadow-sm ${activeClass} bg-white">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid ${prayer.icon} text-green-600 w-6"></i>
-                    <span class="font-bold text-gray-700">${prayer.name}</span>
-                </div>
-                <div class="text-lg font-mono font-semibold text-green-700" style="direction: ltr;">
-                    ${prayer.time}
-                </div>
-            </div>
-        `;
-    });
-
-    // خستنە ناو لیستەکە
-    list.innerHTML = htmlContent;
-}
-
+        
+        // 6. ناونیشانەکان بە کوردی
+        const prayerSchedule = [
+            {name: 'بەیانی', key: 'fajr', time: formatPrayerTime(prayerTimes.fajr), icon: 'fa-moon', arabic: 'الفجر'},
+            {name: 'خۆرهەڵاتن', key: 'sunrise', time: formatPrayerTime(prayerTimes.sunrise), icon: 'fa-sun', arabic: 'الشروق'},
+            {name: 'نیوەڕۆ', key: 'dhuhr', time: formatPrayerTime(prayerTimes.dhuhr), icon: 'fa-cloud-sun', arabic: 'الظهر'},
+            {name: 'عەسر', key: 'asr', time: formatPrayerTime(prayerTimes.asr), icon: 'fa-cloud', arabic: 'العصر'},
+            {name: 'مەغریب', key: 'maghrib', time: formatPrayerTime(prayerTimes.maghrib), icon: 'fa-sunset', arabic: 'المغرب'},
+            {name: 'عیشا', key: 'isha', time: formatPrayerTime(prayerTimes.isha), icon: 'fa-moon-stars', arabic: 'العشاء'}
+        ];
+        
+        // 7. نیشاندان لە HTML
+        const list = document.getElementById('prayerList');
+        list.innerHTML = '';
+        
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        
+        // بینینی کام نوێژ ئێستایە و کامی داهاتووە
+        let currentPrayerIndex = -1;
+        let nextPrayerIndex = -1;
+        
+        prayerSchedule.forEach((prayer, index) => {
+            const [hours, minutes] = prayer.time.split(':').map(Number);
+            const prayerMinutes = hours * 60 + minutes;
+            
+            if (prayerMinutes <= currentMinutes) {
+                currentPrayerIndex = index;
+            } else if (nextPrayerIndex === -1 && prayerMinutes > currentMinutes) {
+                nextPrayerIndex = index;
+            }
+        });
         
         // دروستکردنی لیست
         prayerSchedule.forEach((prayer, index) => {
