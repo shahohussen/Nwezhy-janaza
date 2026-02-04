@@ -12,15 +12,11 @@
 <meta name="description" content="سیستەمی زیرەکی نەخشەسازی حاجیاوا - Ultra Supreme Edition">
 
 <!-- Firebase -->
-
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
 <!-- Core Libraries -->
-
 <script src="https://cdn.tailwindcss.com"></script>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -28,11 +24,9 @@
 <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
 <!-- Prayer Times Library -->
-
 <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.4/PostDist/adhan.min.js"></script>
 
 <!-- Fonts -->
-
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 
@@ -214,6 +208,7 @@
         50% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
     }
 
+    /* فۆنتە نوێیەکان بۆ عەرەبی و کوردی */
     .prayer-arabic {
         font-family: 'Amiri', serif !important;
         font-size: 22px !important;
@@ -238,7 +233,6 @@
 <div class="bg-animated"></div>
 
 <!-- Splash Screen -->
-
 <div id="splashScreen" class="fixed inset-0 z-[9999] bg-gradient-to-br from-ultra-dark via-ultra-darker to-purple-950 flex flex-col items-center justify-center transition-opacity duration-700">
     <div class="relative mb-8" style="animation: float 3s ease-in-out infinite;">
         <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-[32px] blur-3xl opacity-40"></div>
@@ -246,32 +240,33 @@
             <i class="fas fa-kaaba text-6xl text-white"></i>
         </div>
     </div>
-
-```
-<h1 class="text-5xl font-black tracking-[0.25em] mb-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
-    HAJIAWA
-</h1>
-
-<div class="flex items-center gap-3 mb-2">
-    <div class="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
-    <p class="text-blue-400 text-sm font-bold tracking-[0.3em]">ULTRA SUPREME</p>
-    <div class="h-[2px] w-12 bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
-</div>
-
-<p class="text-gray-500 text-xs font-mono mb-10">نەخشەی زیرەکی پێشکەوتوو v7.1 FIXED</p>
-
-<div class="loader-supreme mb-6"></div>
-
-<p id="loadStatus" class="text-gray-400 text-sm font-medium">جارکردنی سیستەم...</p>
-```
-
+    
+    <h1 class="text-5xl font-black tracking-[0.25em] mb-3 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400">
+        HAJIAWA
+    </h1>
+    
+    <div class="flex items-center gap-3 mb-2">
+        <div class="h-[2px] w-12 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+        <p class="text-blue-400 text-sm font-bold tracking-[0.3em]">ULTRA SUPREME</p>
+        <div class="h-[2px] w-12 bg-gradient-to-r from-transparent via-purple-500 to-transparent"></div>
+    </div>
+    
+    <p class="text-gray-500 text-xs font-mono mb-10">نەخشەی زیرەکی پێشکەوتوو v7.0</p>
+    
+    <div class="loader-supreme mb-6"></div>
+    
+    <p id="loadStatus" class="text-gray-400 text-sm font-medium">جارکردنی سیستەم...</p>
+    <!-- زیادکردنی دوگمەی تاقیکردنەوە -->
+    <button onclick="skipLoading()" class="mt-6 text-xs text-gray-500 hover:text-gray-300 transition">
+        <i class="fas fa-forward ml-1"></i>تاقیکردنەوەی پشتگرێدان
+    </button>
 </div>
 
 <div id="map"></div>
 
 <!-- Top Header -->
-
 <div class="fixed top-0 inset-x-0 z-[5000] p-4 bg-gradient-to-b from-black/90 via-black/60 to-transparent pointer-events-none">
+    <!-- ڕیزێکی یەکەم بۆ ناو و گەڕان -->
     <div class="flex items-center justify-between pointer-events-auto max-w-2xl mx-auto gap-3 mb-2">
         <div class="glass rounded-2xl px-4 py-2 flex items-center gap-3 shadow-2xl">
             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-lg">
@@ -283,50 +278,47 @@
             </div>
         </div>
 
-```
-    <div class="flex-1 glass rounded-2xl p-3 flex items-center gap-3 shadow-xl max-w-md">
-        <i class="fas fa-search text-blue-400 text-sm"></i>
-        <input id="searchInput" type="text" oninput="handleSearch()" placeholder="گەڕان بۆ مزگەوت یان پرسە..." class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500">
-        <button onclick="clearSearch()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition">
-            <i class="fas fa-times text-gray-400 text-xs"></i>
-        </button>
-    </div>
-</div>
-
-<div class="flex items-center justify-between pointer-events-auto max-w-2xl mx-auto gap-2">
-    <div class="flex items-center gap-2">
-        <button onclick="showAllMosques()" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95" title="هەموو مزگەوتەکان">
-            <i class="fas fa-expand-alt text-green-400"></i>
-        </button>
-        <button onclick="toggleModal('statsModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 relative" title="ئامار">
-            <i class="fas fa-chart-line text-purple-400"></i>
-            <span id="statsNotif" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-ultra-dark hidden">!</span>
-        </button>
-        <button onclick="toggleModal('prayerModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 relative" title="کاتی نوێژ">
-            <i class="fas fa-clock text-blue-400"></i>
-            <span id="prayerNotif" class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-ultra-dark hidden">1</span>
-        </button>
-        <button onclick="toggleMapStyleMenu()" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95" title="جۆری نەخشە">
-            <i class="fas fa-map text-orange-400"></i>
-        </button>
-        <button onclick="toggleModal('adminModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 admin-btn-pulse" title="ئەدمین">
-            <i class="fas fa-shield-alt text-yellow-400"></i>
-        </button>
+        <div class="flex-1 glass rounded-2xl p-3 flex items-center gap-3 shadow-xl max-w-md">
+            <i class="fas fa-search text-blue-400 text-sm"></i>
+            <input id="searchInput" type="text" oninput="handleSearch()" placeholder="گەڕان بۆ مزگەوت یان پرسە..." class="bg-transparent border-none outline-none w-full text-sm text-white placeholder-gray-500">
+            <button onclick="clearSearch()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition">
+                <i class="fas fa-times text-gray-400 text-xs"></i>
+            </button>
+        </div>
     </div>
     
-    <div id="funeralBadge" class="hidden glass rounded-2xl px-4 py-2 flex items-center gap-3 border border-red-500/30 shadow-xl">
-        <div class="w-3 h-3 rounded-full bg-red-500 animate-ping absolute"></div>
-        <div class="w-3 h-3 rounded-full bg-red-500"></div>
-        <span id="funeralCount" class="text-sm font-bold text-red-200">0 پرسە</span>
-        <i class="fas fa-hands-praying text-red-400"></i>
+    <!-- ڕیزێکی دووەم بۆ دوگمەکان -->
+    <div class="flex items-center justify-between pointer-events-auto max-w-2xl mx-auto gap-2">
+        <div class="flex items-center gap-2">
+            <button onclick="showAllMosques()" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95" title="هەموو مزگەوتەکان">
+                <i class="fas fa-expand-alt text-green-400"></i>
+            </button>
+            <button onclick="toggleModal('statsModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 relative" title="ئامار">
+                <i class="fas fa-chart-line text-purple-400"></i>
+                <span id="statsNotif" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-ultra-dark hidden">!</span>
+            </button>
+            <button onclick="toggleModal('prayerModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 relative" title="کاتی نوێژ">
+                <i class="fas fa-clock text-blue-400"></i>
+                <span id="prayerNotif" class="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-ultra-dark hidden">1</span>
+            </button>
+            <button onclick="toggleMapStyleMenu()" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95" title="جۆری نەخشە">
+                <i class="fas fa-map text-orange-400"></i>
+            </button>
+            <button onclick="toggleModal('adminModal')" class="w-11 h-11 glass rounded-xl flex items-center justify-center hover:bg-white/10 transition active:scale-95 admin-btn-pulse" title="ئەدمین">
+                <i class="fas fa-shield-alt text-yellow-400"></i>
+            </button>
+        </div>
+        
+        <div id="funeralBadge" class="hidden glass rounded-2xl px-4 py-2 flex items-center gap-3 border border-red-500/30 shadow-xl">
+            <div class="w-3 h-3 rounded-full bg-red-500 animate-ping absolute"></div>
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <span id="funeralCount" class="text-sm font-bold text-red-200">0 پرسە</span>
+            <i class="fas fa-hands-praying text-red-400"></i>
+        </div>
     </div>
-</div>
-```
-
 </div>
 
 <!-- Map Style Menu -->
-
 <div id="mapStyleMenu" class="fixed top-20 right-4 z-[6000] glass p-3 rounded-2xl shadow-2xl hidden">
     <div class="grid grid-cols-2 gap-2">
         <button onclick="changeMapStyle('dark')" class="p-3 rounded-xl bg-gray-800 hover:bg-gray-700 transition flex flex-col items-center gap-1">
@@ -349,7 +341,6 @@
 </div>
 
 <!-- Bottom Actions -->
-
 <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[5000] pointer-events-none">
     <div class="glass p-2.5 rounded-[28px] flex items-center gap-2 pointer-events-auto shadow-2xl">
         <button onclick="locateUser()" class="w-14 h-14 rounded-[20px] bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-xl text-white shadow-lg transition active:scale-90">
@@ -366,62 +357,57 @@
 </div>
 
 <!-- Detail Card -->
-
 <div id="detailCard" class="fixed bottom-0 inset-x-0 z-[6000] glass rounded-t-[32px] p-6 transform translate-y-full transition-all duration-500 max-h-[70vh] overflow-y-auto">
     <div class="w-20 h-1.5 bg-white/20 rounded-full mx-auto mb-6"></div>
-
-```
-<button onclick="closeCard()" class="absolute top-6 left-6 w-10 h-10 rounded-xl glass-light flex items-center justify-center hover:bg-white/20 transition">
-    <i class="fas fa-times text-gray-400"></i>
-</button>
-
-<div class="flex flex-col items-center mb-6">
-    <div class="relative mb-4">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-xl opacity-40"></div>
-        <div id="cardIcon" class="relative w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full border-4 border-ultra-dark flex items-center justify-center shadow-2xl">
-            <i class="fas fa-mosque text-3xl text-white"></i>
-        </div>
-    </div>
     
-    <h2 id="cardTitle" class="text-2xl font-black mb-2 text-center">...</h2>
-    <span id="cardDistance" class="hidden px-3 py-1 bg-blue-500/20 border border-blue-500/40 rounded-lg text-blue-300 text-sm font-bold">
-        <i class="fas fa-route ml-1"></i>
-        <span id="cardDistText">0.0 km</span>
-    </span>
-</div>
+    <button onclick="closeCard()" class="absolute top-6 left-6 w-10 h-10 rounded-xl glass-light flex items-center justify-center hover:bg-white/20 transition">
+        <i class="fas fa-times text-gray-400"></i>
+    </button>
 
-<div id="cardDetails" class="glass-light p-4 rounded-2xl mb-4 hidden">
-    <h3 class="font-bold text-sm mb-2 text-blue-400"><i class="fas fa-info-circle ml-1"></i>زانیاری</h3>
-    <p id="cardDescription" class="text-sm text-gray-300"></p>
-</div>
-
-<div id="cardFuneralAlert" class="hidden glass-light p-5 rounded-2xl mb-6 border-r-4 border-red-500">
-    <div class="flex items-start gap-4">
-        <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center">
-            <i class="fas fa-hands-praying text-white text-xl"></i>
+    <div class="flex flex-col items-center mb-6">
+        <div class="relative mb-4">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-xl opacity-40"></div>
+            <div id="cardIcon" class="relative w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full border-4 border-ultra-dark flex items-center justify-center shadow-2xl">
+                <i class="fas fa-mosque text-3xl text-white"></i>
+            </div>
         </div>
-        <div>
-            <h3 class="font-bold text-red-200 text-sm mb-1"><i class="fas fa-exclamation-circle ml-1"></i>ئاگاداری پرسە</h3>
-            <p id="cardDeadName" class="text-white font-bold">...</p>
-            <p id="cardPrayerTime" class="text-gray-400 text-sm"><i class="fas fa-clock ml-1"></i>...</p>
+        
+        <h2 id="cardTitle" class="text-2xl font-black mb-2 text-center">...</h2>
+        <span id="cardDistance" class="hidden px-3 py-1 bg-blue-500/20 border border-blue-500/40 rounded-lg text-blue-300 text-sm font-bold">
+            <i class="fas fa-route ml-1"></i>
+            <span id="cardDistText">0.0 km</span>
+        </span>
+    </div>
+
+    <div id="cardDetails" class="glass-light p-4 rounded-2xl mb-4 hidden">
+        <h3 class="font-bold text-sm mb-2 text-blue-400"><i class="fas fa-info-circle ml-1"></i>زانیاری</h3>
+        <p id="cardDescription" class="text-sm text-gray-300"></p>
+    </div>
+
+    <div id="cardFuneralAlert" class="hidden glass-light p-5 rounded-2xl mb-6 border-r-4 border-red-500">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center">
+                <i class="fas fa-hands-praying text-white text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-red-200 text-sm mb-1"><i class="fas fa-exclamation-circle ml-1"></i>ئاگاداری پرسە</h3>
+                <p id="cardDeadName" class="text-white font-bold">...</p>
+                <p id="cardPrayerTime" class="text-gray-400 text-sm"><i class="fas fa-clock ml-1"></i>...</p>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="grid grid-cols-2 gap-3">
-    <button onclick="startNavigation()" class="bg-gradient-to-r from-blue-600 to-blue-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg">
-        <i class="fas fa-location-arrow"></i>ڕێگا
-    </button>
-    <button onclick="shareLocation()" class="glass-light py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
-        <i class="fas fa-share-nodes"></i>هاوبەش
-    </button>
-</div>
-```
-
+    <div class="grid grid-cols-2 gap-3">
+        <button onclick="startNavigation()" class="bg-gradient-to-r from-blue-600 to-blue-500 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg">
+            <i class="fas fa-location-arrow"></i>ڕێگا
+        </button>
+        <button onclick="shareLocation()" class="glass-light py-4 rounded-2xl font-bold flex items-center justify-center gap-2">
+            <i class="fas fa-share-nodes"></i>هاوبەش
+        </button>
+    </div>
 </div>
 
 <!-- Stats Modal -->
-
 <div id="statsModal" class="modal-container" onclick="if(event.target==this) toggleModal('statsModal')">
     <div class="glass w-full max-w-lg rounded-[32px] p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
@@ -460,24 +446,22 @@
 </div>
 
 <!-- Prayer Modal -->
-
 <div id="prayerModal" class="modal-container" onclick="if(event.target==this) toggleModal('prayerModal')">
     <div class="glass w-full max-w-md rounded-[32px] p-8 shadow-2xl text-center">
         <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-2xl">
             <i class="fas fa-clock text-3xl text-white"></i>
         </div>
-        <h2 class="text-2xl font-black mb-4">کاتی نوێژ - حاجیاوا</h2>
+        <h2 class="text-2xl font-black mb-4">کاتی نوێژ</h2>
         <div id="currentTime" class="mb-6">
             <div class="text-lg font-mono font-bold">--:--:--</div>
             <div class="text-xs text-gray-400 mt-1">بارکردن...</div>
         </div>
-        <div id="prayerList" class="w-full space-y-2"></div>
+        <div id="prayerList" class="space-y-3"></div>
         <button onclick="toggleModal('prayerModal')" class="mt-8 text-gray-500 text-sm">داخستن</button>
     </div>
 </div>
 
 <!-- Janaza Modal -->
-
 <div id="janazaModal" class="modal-container" onclick="if(event.target==this) toggleModal('janazaModal')">
     <div class="glass w-full max-w-lg rounded-[32px] p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
@@ -488,211 +472,207 @@
                 <i class="fas fa-times text-gray-400"></i>
             </button>
         </div>
-
-```
-    <div class="space-y-4 text-sm">
-        <!-- تەکبیری یەکەم -->
-        <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                    <span class="font-black text-white">١</span>
+        
+        <div class="space-y-4 text-sm">
+            <!-- تەکبیری یەکەم -->
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">١</span>
+                    </div>
+                    <h3 class="font-bold text-blue-400 prayer-kurdish">تەکبیری یەکەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
                 </div>
-                <h3 class="font-bold text-blue-400 prayer-kurdish">تەکبیری یەکەم</h3>
-                <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
-            </div>
-            <p class="text-gray-300 mb-2 prayer-kurdish">خوێندنی سورەتی الفاتحة وەکو نوێژی ئادە:</p>
-            <p class="prayer-arabic text-blue-200 leading-loose text-justify pb-3 border-b border-blue-900/30">
-                بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿١﴾ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِينَ ﴿٢﴾ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿٣﴾ مَـٰلِكِ يَوۡمِ ٱلدِّينِ ﴿٤﴾ إِيَّاكَ نَعۡبُدُ وَإِيَّاکَ نَسۡتَعِينُ ﴿٥﴾ ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِيمَ ﴿٦﴾ صِرَٰطَ ٱلَّذِينَ أَنۡعَمۡتَ عَلَيۡهِمۡ غَيْرِ ٱلۡمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّالِّينَ ﴿٧﴾
-            </p>
-            <div class="mt-3 p-3 bg-blue-900/20 rounded-lg">
-                <p class="text-xs text-blue-300 prayer-kurdish"><i class="fas fa-info-circle ml-1"></i>پێش تەکبیر دەڵێیت: "الله أَكْبَر" و ئینجا ئەم سورەتە دەخوێنیت.</p>
-            </div>
-        </div>
-
-        <!-- تەکبیری دووەم -->
-        <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                    <span class="font-black text-white">٢</span>
-                </div>
-                <h3 class="font-bold text-blue-400 prayer-kurdish">تەکبیری دووەم</h3>
-                <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
-            </div>
-            <p class="text-gray-300 mb-2 prayer-kurdish">خوێندنی سەڵاواتی ئیبراهیمی (دروستی بەسەر محمد ﷺ):</p>
-            <p class="prayer-arabic text-blue-200 leading-loose text-justify pb-3 border-b border-blue-900/30">
-                اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ<br>
-                اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ
-            </p>
-            <div class="mt-3 p-3 bg-blue-900/20 rounded-lg">
-                <p class="text-xs text-blue-300 prayer-kurdish"><i class="fas fa-info-circle ml-1"></i>پێش تەکبیری دووەم: "الله أَكْبَر" و ئینجا ئەم سەڵاواتە دەخوێنیت.</p>
-            </div>
-        </div>
-
-        <!-- تەکبیری سێیەم -->
-        <div class="glass-light p-5 rounded-2xl border-r-4 border-green-500">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
-                    <span class="font-black text-white">٣</span>
-                </div>
-                <h3 class="font-bold text-green-400 prayer-kurdish">تەکبیری سێیەم</h3>
-                <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
-            </div>
-            <p class="text-gray-300 mb-2 prayer-kurdish">دوعای مردوو (بۆ پیاو):</p>
-            <p class="prayer-arabic text-green-200 leading-loose text-justify pb-3 border-b border-green-900/30">
-                اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ، وَعَافِهِ وَاعْفُ عَنْهُ، وَأَكْرِمْ نُزُلَهُ، وَوَسِّعْ مُدْخَلَهُ، وَاغْسِلْهُ بِالْمَاءِ وَالثَّلْجِ وَالْبَرَدِ، وَنَقِّهِ مِنَ الْخَطَايَا كَمَا نَقَّيْتَ الثَّوْبَ الْأَبْيَضَ مِنَ الدَّنَسِ، وَأَبْدِلْهُ دَارًا خَيْرًا مِنْ دَارِهِ، وَأَهْلًا خَيْرًا مِنْ أَهْلِهِ، وَزَوْجًا خَيْرًا مِنْ زَوْجِهِ، وَأَدْخِلْهُ الْجَنَّةَ، وَأَعِذْهُ مِنْ عَذَابِ الْقَبْرِ وَعَذَابِ النَّارِ
-            </p>
-            
-            <div class="mt-4 p-4 bg-green-900/20 rounded-lg">
-                <h4 class="font-bold text-green-300 text-sm mb-2 prayer-kurdish">گۆڕانکاری بۆ ژن و منداڵ:</h4>
-                <ul class="text-xs text-green-200 space-y-2 prayer-kurdish">
-                    <li class="flex items-start gap-2">
-                        <span class="font-bold min-w-[50px]">بۆ ژن:</span>
-                        <span class="prayer-arabic text-sm">اللَّهُمَّ اغْفِرْ <span class="text-yellow-300">لَهَا</span> وَارْحَمْ<span class="text-yellow-300">هَا</span></span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="font-bold min-w-[50px]">بۆ منداڵ:</span>
-                        <span class="prayer-arabic text-sm">اللَّهُمَّ اجْعَلْهُ فَرَطًا لِوَالِدَيْهِ وَسَبَبًا فِي شَفَاعَتِهِمَا</span>
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="font-bold min-w-[50px]">بۆ کۆمەڵ:</span>
-                        <span class="prayer-arabic text-sm">اللَّهُمَّ اغْفِرْ لَهُمْ وَارْحَمْهُمْ</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- تەکبیری چوارەم -->
-        <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                    <span class="font-black text-white">٤</span>
-                </div>
-                <h3 class="font-bold text-blue-400 prayer-kurdish">تەکبیری چوارەم</h3>
-                <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
-            </div>
-            <p class="text-gray-300 mb-2 prayer-kurdish">دوعای کۆتایی و سەلام:</p>
-            <p class="prayer-arabic text-blue-200 leading-loose text-justify pb-3 border-b border-blue-900/30">
-                اللَّهُمَّ لَا تَحْرِمْنَا أَجْرَهُ، وَلَا تَفْتِنَّا بَعْدَهُ، وَاغْفِرْ لَنَا وَلَهُ
-            </p>
-            
-            <div class="mt-4">
-                <h4 class="font-bold text-yellow-300 mb-2 prayer-kurdish">سەلامەکە:</h4>
-                <p class="prayer-arabic text-white text-center text-lg p-3 bg-white/5 rounded-xl">
-                    السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
+                <p class="text-gray-300 mb-2 prayer-kurdish">خوێندنی سورەتی الفاتحة وەکو نوێژی ئادە:</p>
+                <p class="prayer-arabic text-blue-200 leading-loose text-justify pb-3 border-b border-blue-900/30">
+                    بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿١﴾ ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِينَ ﴿٢﴾ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ ﴿٣﴾ مَـٰلِكِ يَوۡمِ ٱلدِّينِ ﴿٤﴾ إِيَّاكَ نَعۡبُدُ وَإِيَّاکَ نَسۡتَعِينُ ﴿٥﴾ ٱهۡدِنَا ٱلصِّرَٰطَ ٱلۡمُسۡتَقِيمَ ﴿٦﴾ صِرَٰطَ ٱلَّذِينَ أَنۡعَمۡتَ عَلَيۡهِمۡ غَيْرِ ٱلۡمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّالِّينَ ﴿٧﴾
                 </p>
-            </div>
-            
-            <div class="mt-4 grid grid-cols-2 gap-3">
-                <div class="bg-blue-900/30 p-3 rounded-xl">
-                    <h4 class="text-xs font-bold text-blue-300 mb-1 prayer-kurdish">شێوازی یەکەم:</h4>
-                    <p class="text-[11px] text-gray-300 prayer-kurdish">سەلام لە ڕاستەوە یەک جار دەدەیتەوە</p>
-                </div>
-                <div class="bg-purple-900/30 p-3 rounded-xl">
-                    <h4 class="text-xs font-bold text-purple-300 mb-1 prayer-kurdish">شێوازی دووەم:</h4>
-                    <p class="text-[11px] text-gray-300 prayer-kurdish">سەلام لە ڕاست و چەپەوە دەدەیتەوە</p>
+                <div class="mt-3 p-3 bg-blue-900/20 rounded-lg">
+                    <p class="text-xs text-blue-300 prayer-kurdish"><i class="fas fa-info-circle ml-1"></i>پێش تەکبیر دەڵێیت: "الله أَكْبَر" و ئینجا ئەم سورەتە دەخوێنیت.</p>
                 </div>
             </div>
-        </div>
 
-        <!-- دوعا و تەسبیحی کۆتایی -->
-        <div class="glass-light p-5 rounded-2xl border-r-4 border-purple-500">
-            <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-                    <i class="fas fa-hands-praying text-white"></i>
+            <!-- تەکبیری دووەم -->
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">٢</span>
+                    </div>
+                    <h3 class="font-bold text-blue-400 prayer-kurdish">تەکبیری دووەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
                 </div>
-                <h3 class="font-bold text-purple-400 prayer-kurdish">دوعا و تەسبیحی دوای نوێژ</h3>
+                <p class="text-gray-300 mb-2 prayer-kurdish">خوێندنی سەڵاواتی ئیبراهیمی (دروستی بەسەر محمد ﷺ):</p>
+                <p class="prayer-arabic text-blue-200 leading-loose text-justify pb-3 border-b border-blue-900/30">
+                    اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ<br>
+                    اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ، كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ، إِنَّكَ حَمِيدٌ مَجِيدٌ
+                </p>
+                <div class="mt-3 p-3 bg-blue-900/20 rounded-lg">
+                    <p class="text-xs text-blue-300 prayer-kurdish"><i class="fas fa-info-circle ml-1"></i>پێش تەکبیری دووەم: "الله أَكْبَر" و ئینجا ئەم سەڵاواتە دەخوێنیت.</p>
+                </div>
             </div>
-            
-            <div class="space-y-3">
-                <div class="p-3 bg-purple-900/20 rounded-lg">
-                    <h4 class="text-xs font-bold text-purple-300 mb-1 prayer-kurdish">دوعای کۆتایی:</h4>
-                    <p class="prayer-arabic text-purple-200 leading-relaxed">
-                        سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ، وَسَلَامٌ عَلَى الْمُرْسَلِينَ، وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ
+
+            <!-- تەکبیری سێیەم -->
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-green-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">٣</span>
+                    </div>
+                    <h3 class="font-bold text-green-400 prayer-kurdish">تەکبیری سێیەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
+                </div>
+                <p class="text-gray-300 mb-2 prayer-kurdish">دوعای مردوو (بۆ پیاو):</p>
+                <p class="prayer-arabic text-green-200 leading-loose text-justify pb-3 border-b border-green-900/30">
+                    اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ، وَعَافِهِ وَاعْفُ عَنْهُ، وَأَكْرِمْ نُزُلَهُ، وَوَسِّعْ مُدْخَلَهُ، وَاغْسِلْهُ بِالْمَاءِ وَالثَّلْجِ وَالْبَرَدِ، وَنَقِّهِ مِنَ الْخَطَايَا كَمَا نَقَّيْتَ الثَّوْبَ الْأَبْيَضَ مِنَ الدَّنَسِ، وَأَبْدِلْهُ دَارًا خَيْرًا مِنْ دَارِهِ، وَأَهْلًا خَيْرًا مِنْ أَهْلِهِ، وَزَوْجًا خَيْرًا مِنْ زَوْجِهِ، وَأَدْخِلْهُ الْجَنَّةَ، وَأَعِذْهُ مِنْ عَذَابِ الْقَبْرِ وَعَذَابِ النَّارِ
+                </p>
+                
+                <div class="mt-4 p-4 bg-green-900/20 rounded-lg">
+                    <h4 class="font-bold text-green-300 text-sm mb-2 prayer-kurdish">گۆڕانکاری بۆ ژن و منداڵ:</h4>
+                    <ul class="text-xs text-green-200 space-y-2 prayer-kurdish">
+                        <li class="flex items-start gap-2">
+                            <span class="font-bold min-w-[50px]">بۆ ژن:</span>
+                            <span class="prayer-arabic text-sm">اللَّهُمَّ اغْفِرْ <span class="text-yellow-300">لَهَا</span> وَارْحَمْ<span class="text-yellow-300">هَا</span></span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="font-bold min-w-[50px]">بۆ منداڵ:</span>
+                            <span class="prayer-arabic text-sm">اللَّهُمَّ اجْعَلْهُ فَرَطًا لِوَالِدَيْهِ وَسَبَبًا فِي شَفَاعَتِهِمَا</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="font-bold min-w-[50px]">بۆ کۆمەڵ:</span>
+                            <span class="prayer-arabic text-sm">اللَّهُمَّ اغْفِرْ لَهُمْ وَارْحَمْهُمْ</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- تەکبیری چوارەم -->
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-blue-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                        <span class="font-black text-white">٤</span>
+                    </div>
+                    <h3 class="font-bold text-blue-400 prayer-kurdish">تەکبیری چوارەم</h3>
+                    <span class="text-xs text-gray-400 mr-auto prayer-arabic" style="font-size: 16px;">الله أَكْبَر</span>
+                </div>
+                <p class="text-gray-300 mb-2 prayer-kurdish">دوعای کۆتایی و سەلام:</p>
+                <p class="prayer-arabic text-blue-200 leading-loose text-justify pb-3 border-b border-blue-900/30">
+                    اللَّهُمَّ لَا تَحْرِمْنَا أَجْرَهُ، وَلَا تَفْتِنَّا بَعْدَهُ، وَاغْفِرْ لَنَا وَلَهُ
+                </p>
+                
+                <div class="mt-4">
+                    <h4 class="font-bold text-yellow-300 mb-2 prayer-kurdish">سەلامەکە:</h4>
+                    <p class="prayer-arabic text-white text-center text-lg p-3 bg-white/5 rounded-xl">
+                        السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ
                     </p>
                 </div>
                 
-                <div class="p-3 bg-emerald-900/20 rounded-lg">
-                    <h4 class="text-xs font-bold text-emerald-300 mb-1 prayer-kurdish">تەسبیحی ڕاستەقینە:</h4>
-                    <div class="space-y-2 prayer-kurdish">
-                        <div class="flex justify-between items-center">
-                            <span class="text-emerald-200">٣٣ جار:</span>
-                            <span class="prayer-arabic text-emerald-300">سُبْحَانَ اللَّهِ</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-emerald-200">٣٣ جار:</span>
-                            <span class="prayer-arabic text-emerald-300">الْحَمْدُ لِلَّهِ</span>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-emerald-200">٣٣ جار:</span>
-                            <span class="prayer-arabic text-emerald-300">اللَّهُ أَكْبَرُ</span>
-                        </div>
-                        <div class="mt-2 pt-2 border-t border-emerald-800/30">
-                            <span class="text-emerald-200 block mb-1">کۆتایی:</span>
-                            <span class="prayer-arabic text-emerald-300 text-sm">لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ</span>
-                        </div>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div class="bg-blue-900/30 p-3 rounded-xl">
+                        <h4 class="text-xs font-bold text-blue-300 mb-1 prayer-kurdish">شێوازی یەکەم:</h4>
+                        <p class="text-[11px] text-gray-300 prayer-kurdish">سەلام لە ڕاستەوە یەک جار دەدەیتەوە</p>
+                    </div>
+                    <div class="bg-purple-900/30 p-3 rounded-xl">
+                        <h4 class="text-xs font-bold text-purple-300 mb-1 prayer-kurdish">شێوازی دووەم:</h4>
+                        <p class="text-[11px] text-gray-300 prayer-kurdish">سەلام لە ڕاست و چەپەوە دەدەیتەوە</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- دوعا و تەسبیحی کۆتایی -->
+            <div class="glass-light p-5 rounded-2xl border-r-4 border-purple-500">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-hands-praying text-white"></i>
+                    </div>
+                    <h3 class="font-bold text-purple-400 prayer-kurdish">دوعا و تەسبیحی دوای نوێژ</h3>
+                </div>
                 
-                <div class="p-3 bg-amber-900/20 rounded-lg">
-                    <h4 class="text-xs font-bold text-amber-300 mb-1 prayer-kurdish">دوعای خێر:</h4>
-                    <p class="prayer-arabic text-amber-200">
-                        اللَّهُمَّ أَجِرْنِي فِي مُصِيبَتِي، وَاخْلُفْ لِي خَيْرًا مِنْهَا
+                <div class="space-y-3">
+                    <div class="p-3 bg-purple-900/20 rounded-lg">
+                        <h4 class="text-xs font-bold text-purple-300 mb-1 prayer-kurdish">دوعای کۆتایی:</h4>
+                        <p class="prayer-arabic text-purple-200 leading-relaxed">
+                            سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ، وَسَلَامٌ عَلَى الْمُرْسَلِينَ، وَالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ
+                        </p>
+                    </div>
+                    
+                    <div class="p-3 bg-emerald-900/20 rounded-lg">
+                        <h4 class="text-xs font-bold text-emerald-300 mb-1 prayer-kurdish">تەسبیحی ڕاستەقینە:</h4>
+                        <div class="space-y-2 prayer-kurdish">
+                            <div class="flex justify-between items-center">
+                                <span class="text-emerald-200">٣٣ جار:</span>
+                                <span class="prayer-arabic text-emerald-300">سُبْحَانَ اللَّهِ</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-emerald-200">٣٣ جار:</span>
+                                <span class="prayer-arabic text-emerald-300">الْحَمْدُ لِلَّهِ</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-emerald-200">٣٣ جار:</span>
+                                <span class="prayer-arabic text-emerald-300">اللَّهُ أَكْبَرُ</span>
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-emerald-800/30">
+                                <span class="text-emerald-200 block mb-1">کۆتایی:</span>
+                                <span class="prayer-arabic text-emerald-300 text-sm">لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-3 bg-amber-900/20 rounded-lg">
+                        <h4 class="text-xs font-bold text-amber-300 mb-1 prayer-kurdish">دوعای خێر:</h4>
+                        <p class="prayer-arabic text-amber-200">
+                            اللَّهُمَّ أَجِرْنِي فِي مُصِيبَتِي، وَاخْلُفْ لِي خَيْرًا مِنْهَا
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تێبینی و فەرمانەکان -->
+            <div class="glass-light p-4 rounded-2xl bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700">
+                <h4 class="font-bold text-yellow-400 text-sm mb-3 flex items-center gap-2 prayer-kurdish">
+                    <i class="fas fa-lightbulb"></i>فەرمان و تێبینیە گرنگەکان
+                </h4>
+                <ul class="text-xs text-gray-300 space-y-2 prayer-kurdish">
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>نوێژی جەنازە <span class="text-yellow-300">چوار تەکبیر</span> و <span class="text-yellow-300">سێ تەکبیر</span> هەیە، ئەمە چوار تەکبیرە.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>نوێژ <span class="text-yellow-300">بەهەموو قورئانێک</span> بکرێت دەتوانیت، تەنها سوورەتی فاتحە لەسەر هەمووان واجبە.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>ئیمام لە <span class="text-yellow-300">سەری مردوو</span> دادەنیشت (پیاو لە سەری، ژن لە ناوەڕاستی).</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>نوێژی جەنازە <span class="text-yellow-300">لەسەر زەوی پاک</span> یان لەسەر حەسیر دەکرێت، لە ناو مزگەوتدا ناکرێت.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>ئەگەر <span class="text-yellow-300">نزیکترین خزم</span> بێت، لە پێشەوەی ئیمام دادەنیشت.</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
+                        <span>دوای تەواوبوونی نوێژ، <span class="text-yellow-300">نەکوترا</span> و دەست مەکێشە بەسەر مردوودا.</span>
+                    </li>
+                </ul>
+                
+                <div class="mt-3 p-3 bg-black/40 rounded-lg">
+                    <p class="text-xs text-center text-gray-400 prayer-kurdish">
+                        <i class="fas fa-info-circle ml-1"></i>
+                        ئەم دوعایانە بەپێی سوننەتی پێغەمبەر ﷺ و فەرموودەی دەستەڵاتدارانە
                     </p>
                 </div>
             </div>
         </div>
-
-        <!-- تێبینی و فەرمانەکان -->
-        <div class="glass-light p-4 rounded-2xl bg-gradient-to-r from-gray-900/50 to-gray-800/50 border border-gray-700">
-            <h4 class="font-bold text-yellow-400 text-sm mb-3 flex items-center gap-2 prayer-kurdish">
-                <i class="fas fa-lightbulb"></i>فەرمان و تێبینیە گرنگەکان
-            </h4>
-            <ul class="text-xs text-gray-300 space-y-2 prayer-kurdish">
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
-                    <span>نوێژی جەنازە <span class="text-yellow-300">چوار تەکبیر</span> و <span class="text-yellow-300">سێ تەکبیر</span> هەیە، ئەمە چوار تەکبیرە.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
-                    <span>نوێژ <span class="text-yellow-300">بەهەموو قورئانێک</span> بکرێت دەتوانیت، تەنها سوورەتی فاتحە لەسەر هەمووان واجبە.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
-                    <span>ئیمام لە <span class="text-yellow-300">سەری مردوو</span> دادەنیشت (پیاو لە سەری، ژن لە ناوەڕاستی).</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
-                    <span>نوێژی جەنازە <span class="text-yellow-300">لەسەر زەوی پاک</span> یان لەسەر حەسیر دەکرێت، لە ناو مزگەوتدا ناکرێت.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
-                    <span>ئەگەر <span class="text-yellow-300">نزیکترین خزم</span> بێت، لە پێشەوەی ئیمام دادەنیشت.</span>
-                </li>
-                <li class="flex items-start gap-2">
-                    <i class="fas fa-check-circle text-green-400 mt-0.5"></i>
-                    <span>دوای تەواوبوونی نوێژ، <span class="text-yellow-300">نەکوترا</span> و دەست مەکێشە بەسەر مردوودا.</span>
-                </li>
-            </ul>
-            
-            <div class="mt-3 p-3 bg-black/40 rounded-lg">
-                <p class="text-xs text-center text-gray-400 prayer-kurdish">
-                    <i class="fas fa-info-circle ml-1"></i>
-                    ئەم دوعایانە بەپێی سوننەتی پێغەمبەر ﷺ و فەرموودەی دەستەڵاتدارانە
-                </p>
-            </div>
-        </div>
+        
+        <button onclick="toggleModal('janazaModal')" class="w-full mt-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold shadow-lg hover:opacity-90 transition prayer-kurdish">
+            <i class="fas fa-times-circle ml-1"></i>داخستن
+        </button>
     </div>
-    
-    <button onclick="toggleModal('janazaModal')" class="w-full mt-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl font-bold shadow-lg hover:opacity-90 transition prayer-kurdish">
-        <i class="fas fa-times-circle ml-1"></i>داخستن
-    </button>
-</div>
-```
-
 </div>
 
 <!-- Admin Modal -->
-
 <div id="adminModal" class="modal-container" onclick="if(event.target==this) toggleModal('adminModal')">
     <div class="glass w-full max-w-lg rounded-[32px] p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
@@ -702,104 +682,101 @@
             </button>
         </div>
 
-```
-    <input type="password" id="adminPass" placeholder="🔒 کۆدی ئەدمین" class="w-full glass-light p-4 rounded-2xl mb-4 outline-none border border-white/10 text-center font-bold placeholder-gray-500">
+        <!-- Admin Password -->
+        <input type="password" id="adminPass" placeholder="🔒 کۆدی ئەدمین" class="w-full glass-light p-4 rounded-2xl mb-4 outline-none border border-white/10 text-center font-bold placeholder-gray-500">
 
-    <div class="glass-light p-2 rounded-2xl flex gap-2 mb-4">
-        <button onclick="showAdminTab('funeral')" id="tabFuneral" class="flex-1 py-3 rounded-xl bg-red-600 font-bold text-sm">
-            <i class="fas fa-hands-praying ml-1"></i>پرسە
-        </button>
-        <button onclick="showAdminTab('mosque')" id="tabMosque" class="flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm">
-            <i class="fas fa-mosque ml-1"></i>مزگەوت
-        </button>
-        <button onclick="showAdminTab('edit')" id="tabEdit" class="flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm">
-            <i class="fas fa-edit ml-1"></i>دەستکاری
-        </button>
-    </div>
-
-    <!-- Funeral Form -->
-    <div id="funeralForm" class="space-y-3">
-        <div class="glass-light p-4 rounded-2xl">
-            <h3 class="font-bold text-sm mb-3 text-red-400"><i class="fas fa-plus-circle ml-1"></i>پرسەی نوێ</h3>
-            <select id="mosqueSelect" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3"></select>
-            <input id="deceasedName" placeholder="ناوی کۆچکردوو" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
-            <input id="prayerTime" type="time" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
-            <button onclick="submitFuneral()" class="w-full bg-red-600 py-4 rounded-2xl font-bold">
-                <i class="fas fa-paper-plane ml-1"></i>بڵاوکردنەوە
+        <div class="glass-light p-2 rounded-2xl flex gap-2 mb-4">
+            <button onclick="showAdminTab('funeral')" id="tabFuneral" class="flex-1 py-3 rounded-xl bg-red-600 font-bold text-sm">
+                <i class="fas fa-hands-praying ml-1"></i>پرسە
+            </button>
+            <button onclick="showAdminTab('mosque')" id="tabMosque" class="flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm">
+                <i class="fas fa-mosque ml-1"></i>مزگەوت
+            </button>
+            <button onclick="showAdminTab('edit')" id="tabEdit" class="flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm">
+                <i class="fas fa-edit ml-1"></i>دەستکاری
             </button>
         </div>
-        <div class="glass-light p-4 rounded-2xl">
-            <h3 class="text-sm font-bold text-red-400 mb-3"><i class="fas fa-list ml-1"></i>پرسە چالاکەکان</h3>
-            <div id="adminFuneralList" class="space-y-2 max-h-48 overflow-y-auto"></div>
-        </div>
-    </div>
 
-    <!-- Mosque Add Form -->
-    <div id="mosqueForm" class="hidden space-y-3">
-        <div class="glass-light p-4 rounded-2xl">
-            <h3 class="font-bold text-sm mb-3 text-green-400"><i class="fas fa-plus-circle ml-1"></i>مزگەوتی نوێ</h3>
-            <input id="mosqueName" placeholder="ناوی مزگەوت" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <input id="mosqueLat" placeholder="Lat" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
-                <input id="mosqueLng" placeholder="Lng" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+        <!-- Funeral Form -->
+        <div id="funeralForm" class="space-y-3">
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="font-bold text-sm mb-3 text-red-400"><i class="fas fa-plus-circle ml-1"></i>پرسەی نوێ</h3>
+                <select id="mosqueSelect" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3"></select>
+                <input id="deceasedName" placeholder="ناوی کۆچکردوو" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                <input id="prayerTime" type="time" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                <button onclick="submitFuneral()" class="w-full bg-red-600 py-4 rounded-2xl font-bold">
+                    <i class="fas fa-paper-plane ml-1"></i>بڵاوکردنەوە
+                </button>
             </div>
-            <button onclick="useCurrentLocation()" class="w-full bg-blue-600 py-3 rounded-xl text-sm font-bold mb-3">
-                <i class="fas fa-crosshairs ml-1"></i>شوێنی ئێستا
-            </button>
-            <button onclick="submitMosque()" class="w-full bg-green-600 py-4 rounded-2xl font-bold">
-                <i class="fas fa-plus ml-1"></i>زیادکردن
-            </button>
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="text-sm font-bold text-red-400 mb-3"><i class="fas fa-list ml-1"></i>پرسە چالاکەکان</h3>
+                <div id="adminFuneralList" class="space-y-2 max-h-48 overflow-y-auto"></div>
+            </div>
         </div>
-    </div>
 
-    <!-- Edit Mosques Form -->
-    <div id="editForm" class="hidden space-y-3">
-        <div class="glass-light p-4 rounded-2xl">
-            <h3 class="font-bold text-sm mb-3 text-blue-400"><i class="fas fa-edit ml-1"></i>دەستکاری و سڕینەوەی مزگەوت</h3>
-            <p class="text-xs text-gray-400 mb-3">مزگەوتی هەڵبژێرە بۆ دەستکاری یان سڕینەوە</p>
-            <select id="editMosqueSelect" onchange="loadMosqueForEdit()" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
-                <option value="">مزگەوتێک هەڵبژێرە...</option>
-            </select>
-            
-            <div id="editMosqueForm" class="hidden">
-                <input id="editMosqueName" placeholder="ناوی نوێی مزگەوت" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+        <!-- Mosque Add Form -->
+        <div id="mosqueForm" class="hidden space-y-3">
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="font-bold text-sm mb-3 text-green-400"><i class="fas fa-plus-circle ml-1"></i>مزگەوتی نوێ</h3>
+                <input id="mosqueName" placeholder="ناوی مزگەوت" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
                 <div class="grid grid-cols-2 gap-3 mb-3">
-                    <input id="editMosqueLat" placeholder="Lat" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
-                    <input id="editMosqueLng" placeholder="Lng" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+                    <input id="mosqueLat" placeholder="Lat" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+                    <input id="mosqueLng" placeholder="Lng" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
                 </div>
-                <textarea id="editMosqueDesc" placeholder="زانیاری زیادە (ئارەزوومەندانە)" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3 text-sm min-h-[80px]"></textarea>
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="updateMosque()" class="bg-blue-600 py-4 rounded-2xl font-bold">
-                        <i class="fas fa-save ml-1"></i>نوێکردنەوە
-                    </button>
-                    <button onclick="deleteMosque()" class="bg-red-600 py-4 rounded-2xl font-bold">
-                        <i class="fas fa-trash ml-1"></i>سڕینەوە
-                    </button>
-                </div>
-            </div>
-            
-            <div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
-                <h4 class="text-xs font-bold text-blue-300 mb-2">تێبینی:</h4>
-                <ul class="text-xs text-gray-300 space-y-1">
-                    <li>• تەنها مزگەوتەکانی زیادکراو (Custom) دەتوانرێن دەستکاری بکرێن</li>
-                    <li>• مزگەوتە بنەڕەتییەکانی حاجیاوا ناتوانرێن سڕدرێنەوە</li>
-                    <li>• شوێنی نەخشە کلیک بکە بۆ وەرگرتنی پۆتانەکان</li>
-                </ul>
+                <button onclick="useCurrentLocation()" class="w-full bg-blue-600 py-3 rounded-xl text-sm font-bold mb-3">
+                    <i class="fas fa-crosshairs ml-1"></i>شوێنی ئێستا
+                </button>
+                <button onclick="submitMosque()" class="w-full bg-green-600 py-4 rounded-2xl font-bold">
+                    <i class="fas fa-plus ml-1"></i>زیادکردن
+                </button>
             </div>
         </div>
-    </div>
-    
-    <button onclick="toggleModal('adminModal')" class="w-full mt-4 py-4 glass-light rounded-2xl font-bold">
-        داخستن
-    </button>
-</div>
-```
 
+        <!-- Edit Mosques Form -->
+        <div id="editForm" class="hidden space-y-3">
+            <div class="glass-light p-4 rounded-2xl">
+                <h3 class="font-bold text-sm mb-3 text-blue-400"><i class="fas fa-edit ml-1"></i>دەستکاری و سڕینەوەی مزگەوت</h3>
+                <p class="text-xs text-gray-400 mb-3">مزگەوتی هەڵبژێرە بۆ دەستکاری یان سڕینەوە</p>
+                <select id="editMosqueSelect" onchange="loadMosqueForEdit()" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                    <option value="">مزگەوتێک هەڵبژێرە...</option>
+                </select>
+                
+                <div id="editMosqueForm" class="hidden">
+                    <input id="editMosqueName" placeholder="ناوی نوێی مزگەوت" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input id="editMosqueLat" placeholder="Lat" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+                        <input id="editMosqueLng" placeholder="Lng" class="bg-black/30 p-4 rounded-xl text-center text-xs outline-none border border-white/10">
+                    </div>
+                    <textarea id="editMosqueDesc" placeholder="زانیاری زیادە (ئارەزوومەندانە)" class="w-full bg-black/30 p-4 rounded-xl outline-none border border-white/10 mb-3 text-sm min-h-[80px]"></textarea>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="updateMosque()" class="bg-blue-600 py-4 rounded-2xl font-bold">
+                            <i class="fas fa-save ml-1"></i>نوێکردنەوە
+                        </button>
+                        <button onclick="deleteMosque()" class="bg-red-600 py-4 rounded-2xl font-bold">
+                            <i class="fas fa-trash ml-1"></i>سڕینەوە
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+                    <h4 class="text-xs font-bold text-blue-300 mb-2">تێبینی:</h4>
+                    <ul class="text-xs text-gray-300 space-y-1">
+                        <li>• تەنها مزگەوتەکانی زیادکراو (Custom) دەتوانرێن دەستکاری بکرێن</li>
+                        <li>• مزگەوتە بنەڕەتییەکانی حاجیاوا ناتوانرێن سڕدرێنەوە</li>
+                        <li>• شوێنی نەخشە کلیک بکە بۆ وەرگرتنی پۆتانەکان</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="toggleModal('adminModal')" class="w-full mt-4 py-4 glass-light rounded-2xl font-bold">
+            داخستن
+        </button>
+    </div>
 </div>
 
 <!-- Toast -->
-
 <div id="toastNotif" class="toast-container">
     <div class="glass px-6 py-3 rounded-2xl flex items-center gap-3 shadow-2xl">
         <i id="toastIcon" class="fas fa-check-circle text-green-400 text-xl"></i>
@@ -808,7 +785,31 @@
 </div>
 
 <script>
-    console.log("=== HAJIAWA ULTRA SUPREME v7.1 FIXED ===");
+    console.log("=== HAJIAWA ULTRA SUPREME v7.0 ===");
+    console.log("تاقیکردنەوەی بارکردنی هەموو سکریپتەکان...");
+
+    // پشکنینی Leaflet
+    if(typeof L === 'undefined') {
+        console.error("❌ Leaflet بارنەکراوە!");
+        document.getElementById('loadStatus').textContent = "کێشە لە Leaflet";
+    } else {
+        console.log("✅ Leaflet بارکراوە");
+    }
+
+    // پشکنینی Firebase
+    if(typeof firebase === 'undefined') {
+        console.warn("⚠️ Firebase بارنەکراوە، ئۆفلاین مۆد");
+        document.getElementById('loadStatus').textContent = "ئۆفلاین مۆد";
+    } else {
+        console.log("✅ Firebase بارکراوە");
+    }
+
+    // پشکنینی Tailwind
+    if(typeof tailwind === 'undefined') {
+        console.warn("⚠️ Tailwind بارنەکراوە");
+    } else {
+        console.log("✅ Tailwind بارکراوە");
+    }
 
     const firebaseConfig = {
         apiKey: "AIzaSyAoPWYvcDV875kkrU2Op7kSUV2GGmqdUkA",
@@ -825,13 +826,9 @@
     let funerals = {};
     let selectedMosque = null;
     let userPos = null;
+    let prayerTimes = null;
 
-    // ✅ پۆتانە ڕاستەقینەکانی حاجیاوا (بە دەقیق)
-    const HAJIAWA_COORDS = {
-        latitude: 36.2234,    // پۆتانی ڕاستەقینەی حاجیاوا
-        longitude: 44.8166
-    };
-
+    // مزگەوتە ڕاستەقینەکانی حاجیاوا - وەک کۆدی سەرەتایی تۆ
     const BACKUP_MOSQUES = [
         {id: "m1", name: "مزگەوتی گەورەی حاجیاوا", lat: 36.2369, lng: 44.7869, description: "مزگەوتی گەورەی شار"},
         {id: "m2", name: "مزگەوتی شەھیدان", lat: 36.2355, lng: 44.7885},
@@ -843,278 +840,131 @@
         {id: "m31", name: "مزگەوتی سەلاحەدین", lat: 36.2340, lng: 44.7850}
     ];
 
-    // ✅ چارەسەری یەکەم: کاتەکانی نوێژی ڕاستەقینە بۆ حاجیاوا
-    function updatePrayerTimes() {
-        if (typeof adhan === 'undefined') {
-            console.warn("کتێبخانەی Adhan بار نەبووە");
-            displayFallbackPrayerTimes();
-            return;
-        }
-
-        try {
-            const coordinates = new adhan.Coordinates(
-                HAJIAWA_COORDS.latitude, 
-                HAJIAWA_COORDS.longitude
-            );
-            const date = new Date();
-            
-            // ✅ میتۆدی ڕاستەقینەی حاجیاوا: جیهانی ئیسلامی + شافعی
-            const params = adhan.CalculationMethod.MuslimWorldLeague();
-            params.madhab = adhan.Madhab.Shafi;
-            
-            // ✅ دەستکاری بۆ حاجیاوا (بەپێی قەزای حاجیاوا)
-            params.adjustments = {
-                fajr: 0,      // بەیانی
-                sunrise: 0,   // خۆرهەڵات
-                dhuhr: 2,     // نیوەڕۆ: +2 خولەک
-                asr: 1,       // عەسر: +1 خولەک
-                maghrib: 1,   // مەغریب: +1 خولەک
-                isha: 2       // عیشا: +2 خولەک
-            };
-
-            const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
-
-            function formatTime(time) {
-                let h = time.getHours();
-                let m = time.getMinutes();
-                return `${h}:${m < 10 ? '0' + m : m}`;
-            }
-
-            const prayerSchedule = [
-                {key: 'fajr', name: 'بەیانی', time: formatTime(prayerTimes.fajr), icon: 'fa-moon', arabic: 'الفجر'},
-                {key: 'sunrise', name: 'خۆرهەڵاتن', time: formatTime(prayerTimes.sunrise), icon: 'fa-sun', arabic: 'الشروق'},
-                {key: 'dhuhr', name: 'نیوەڕۆ', time: formatTime(prayerTimes.dhuhr), icon: 'fa-sun', arabic: 'الظهر'},
-                {key: 'asr', name: 'عەسر', time: formatTime(prayerTimes.asr), icon: 'fa-cloud-sun', arabic: 'العصر'},
-                {key: 'maghrib', name: 'مەغریب', time: formatTime(prayerTimes.maghrib), icon: 'fa-moon', arabic: 'المغرب'},
-                {key: 'isha', name: 'عیشا', time: formatTime(prayerTimes.isha), icon: 'fa-star', arabic: 'العشاء'}
-            ];
-
-            renderPrayerList(prayerSchedule);
-        } catch (e) {
-            console.error("هەڵە لە حیسابی نوێژ:", e);
-            displayFallbackPrayerTimes();
-        }
-    }
-
-    function displayFallbackPrayerTimes() {
-        const fallback = [
-            {key: 'fajr', name: 'بەیانی', time: '05:37', icon: 'fa-moon', arabic: 'الفجر'},
-            {key: 'sunrise', name: 'خۆرهەڵاتن', time: '06:59', icon: 'fa-sun', arabic: 'الشروق'},
-            {key: 'dhuhr', name: 'نیوەڕۆ', time: '12:21', icon: 'fa-sun', arabic: 'الظهر'},
-            {key: 'asr', name: 'عەسر', time: '03:11', icon: 'fa-cloud-sun', arabic: 'العصر'},
-            {key: 'maghrib', name: 'مەغریب', time: '05:39', icon: 'fa-moon', arabic: 'المغرب'},
-            {key: 'isha', name: 'عیشا', time: '06:58', icon: 'fa-star', arabic: 'العشاء'}
-        ];
-        renderPrayerList(fallback);
-    }
-
-    
-}
-
-function renderPrayerList(prayerSchedule) {
-    const list = document.getElementById('prayerList');
-    if (!list) return;
-
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    
-    let nextPrayerIndex = -1;
-    prayerSchedule.forEach((prayer, index) => {
-        const [h, m] = prayer.time.split(':').map(Number);
-        if (h * 60 + m > currentMinutes && nextPrayerIndex === -1) {
-            nextPrayerIndex = index;
-        }
-    });
-
-    list.innerHTML = ''; // خاڵیکردنەوەی لیستەکە
-
-    prayerSchedule.forEach((prayer, index) => {
-        const [hours, minutes] = prayer.time.split(':').map(Number);
-        const prayerMinutes = hours * 60 + minutes;
-        
-        // --- ١. حیسابی کاتی ماوە ---
-        let timeRemaining = '';
-        if (prayerMinutes > currentMinutes) {
-            const remaining = prayerMinutes - currentMinutes;
-            const hoursRemaining = Math.floor(remaining / 60);
-            const minutesRemaining = remaining % 60;
-            timeRemaining = hoursRemaining > 0 ? `${hoursRemaining}ک ${minutesRemaining}خ` : `${minutesRemaining}خ`;
-        } else {
-            timeRemaining = 'تەواو بوو';
-        }
-        
-        // --- ٢. حیسابی کاتی هەینی و کاتی ئەسڵ ---
-        let displayTime = prayer.time;
-        if (prayer.key === 'dhuhr' && now.getDay() === 5) {
-            const h = parseInt(prayer.time.split(':')[0]);
-            const m = parseInt(prayer.time.split(':')[1]) + 30;
-            const newHours = h + Math.floor(m / 60);
-            const newMinutes = m % 60;
-            displayTime = `${newHours}:${newMinutes < 10 ? '0' : ''}${newMinutes}`;
-        }
-
-        // --- ٣. گۆڕین بۆ ١٢ سەعاتی (گرنگترین بەش) ---
-        // لێرەدا کاتەکە دەگۆڕین و دەیکەینە گۆڕاوێکی نوێ بەناوی finalTime
-        let finalTime = convertTo12Hour(displayTime);
-
-
-        // --- ٤. دروستکردنی HTML ---
-        // دڵنیابە لێرەدا `finalTime` بەکاردێنیت نەک `prayer.time`
-        
-        const li = document.createElement('li');
-        // ئەگەر دیزاینەکەت class-ی تایبەتی هەیە بۆ نوێژی داهاتوو، لێرە زیادی بکە
-        if (index === nextPrayerIndex) {
-            li.classList.add('active'); // یان هەر ناوێک کە خۆت بەکارت هێناوە
-        }
-
-        li.innerHTML = `
-            <div class="prayer-item">
-                <span class="icon"><i class="fas ${prayer.icon}"></i></span>
-                <span class="name">${prayer.name}</span>
-                <span class="time" style="direction: ltr;">${finalTime}</span>
-                <span class="remaining">${timeRemaining}</span>
-            </div>
-        `;
-        
-        // ئەگەر شێوازی HTML-ەکەت جیاوازە، تکایە کۆدی HTML-ی خۆت لێرە دابنێ
-        // بەڵام لەجیاتی ${prayer.time} بنووسە ${finalTime}
-
-        list.appendChild(li);
-    });
-
-        function convertTo12Hour(time) {
-    let [h, m] = time.split(':').map(Number);
-    let period = h >= 12 ? 'PM' : 'AM';
-    h = h % 12;
-    h = h ? h : 12; // ئەگەر ٠ بوو بیکە بە ١٢
-    return `${h}:${m < 10 ? '0' + m : m} ${period}`;
-}
-
-}
-
-            
-            list.innerHTML += `
-                <div class="flex justify-between items-center p-4 rounded-2xl ${isNext ? 'prayer-next' : 'glass-light'} transition-all">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br ${isNext ? 'from-blue-500 to-purple-500' : 'from-white/10 to-white/5'} flex items-center justify-center shadow-lg">
-                            <i class="fas ${prayer.icon} ${isNext ? 'text-white' : 'text-gray-400'}"></i>
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-sm ${isNext ? 'text-white' : 'text-gray-300'}">${prayer.name}</span>
-                                ${isNext ? '<span class="text-xs bg-blue-500/40 px-2 py-0.5 rounded-lg text-blue-200">داهاتوو</span>' : ''}
-                            </div>
-                            <span class="block text-[10px] ${isNext ? 'text-blue-300' : 'text-gray-500'} mt-0.5">${prayer.arabic}</span>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-mono text-lg font-bold ${isNext ? 'text-blue-200' : 'text-gray-400'} block">${displayTime}</span>
-                        <span class="text-xs ${isNext ? 'text-blue-300' : 'text-gray-500'} font-mono">${timeRemaining}</span>
-                    </div>
-                </div>
-            `;
-        });
-        
-        if (nextPrayerIndex !== -1) {
-            const nextPrayer = prayerSchedule[nextPrayerIndex];
-            const notif = document.getElementById('prayerNotif');
-            if(notif) {
-                notif.textContent = nextPrayer.name;
-                notif.classList.remove('hidden');
-            }
-        }
-        
-        // تێبینی
-        const note = document.createElement('div');
-        note.className = 'mt-4 p-3 bg-blue-900/20 rounded-xl border border-blue-800/30';
-        note.innerHTML = `
-            <p class="text-xs text-blue-300 text-center">
-                <i class="fas fa-map-marker-alt ml-1"></i>
-                کاتەکان بۆ حاجیاوا - میتۆدی جیهانی ئیسلامی - مەزهەبی شافعی
-            </p>
-        `;
-        list.appendChild(note);
-    }
-
-    function updateCurrentTimeDisplay() {
-        const container = document.getElementById('currentTime');
-        if (!container) return;
-
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { hour12: false });
-        
-        const kurdishDays = ['یەکشەممە', 'دووشەممە', 'سێشەممە', 'چوارشەممە', 'پێنجشەممە', 'هەینی', 'شەممە'];
-        const kurdishMonths = ['کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 'ئایار', 'حوزەیران', 'تەمووز', 'ئاب', 'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'];
-        
-        const dayName = kurdishDays[now.getDay()];
-        const monthName = kurdishMonths[now.getMonth()];
-        const year = now.getFullYear();
-        const day = now.getDate();
-        const dateString = `${dayName}، ${day} ${monthName} ${year}`;
-
-        container.innerHTML = `
-            <div class="text-3xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 tracking-wider">${timeString}</div>
-            <div class="text-sm text-gray-400 mt-2">${dateString}</div>
-        `;
-    }
-
-    // ✅ چارەسەری دووەم: باشترکردنی خێرایی و چارەسەری گڵیچ
+        // ئەم بەشە بخەرە شوێنی window.addEventListener('load', ...) ی کۆنەکە
     window.addEventListener('load', async () => {
-        console.log("🚀 دەستپێکردن...");
+        console.log("🚀 دەستپێکردنی بارکردنی سیستەم...");
 
+        // فەرمانی لابردنی سپلاش سکرین (بە جیا دەینوسین)
         const removeSplash = () => {
             const splash = document.getElementById('splashScreen');
             if(splash) {
                 splash.style.opacity = '0';
-                setTimeout(() => splash.style.display = 'none', 500);
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 700);
             }
         };
 
-        // ✅ تایم ئاوت: دوای 2.5 چرکە splash لاببە
-        setTimeout(removeSplash, 2500);
+        // سەلامەتی: دانانی تایمەرێک کە ئەگەر دوای ٥ چرکە بەرنامەکە نەکرایەوە، بە زۆر بیکاتەوە
+        // ئەمە چارەسەری کێشەکەت دەکات
+        setTimeout(() => {
+            console.log("⚠️ کات تەواو بوو (Safety Timeout) - لابردنی شاشە بە زۆر");
+            removeSplash();
+        }, 5000);
 
         try {
-            // ✅ یەکەم: کاتەکانی نوێژ بارکەرەوە (بەبێ ئینتەرنێتیش کار دەکات)
-            updatePrayerTimes();
-            setInterval(updatePrayerTimes, 60000);
-            setInterval(updateCurrentTimeDisplay, 1000);
-            updateCurrentTimeDisplay();
+            // پشکنین بۆ دڵنیابوون لەوەی کتێبخانەکان بار بوون
+            if (typeof L === 'undefined') throw new Error("کتێبخانەی نەخشە (Leaflet) بار نەبووە");
+            if (typeof adhan === 'undefined') console.warn("کتێبخانەی بانگ (Adhan) بار نەبووە");
 
-            // ✅ دووەم: نەخشە
-            initMap();
-
-            // ✅ سێیەم: Firebase بە timeout
+            // هەوڵدان بۆ گرێدانی فایەربەیس
             try {
-                const app = firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-                console.log("✅ Firebase گرێدراوە");
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Firebase timeout')), 5000)
+                );
+                
+                const firebasePromise = (async () => {
+                    if (typeof firebase !== 'undefined') {
+                        const app = firebase.initializeApp(firebaseConfig);
+                        db = firebase.database();
+                        console.log("✅ Firebase گرێدراوە!");
+                        updateLoadStatus("گرێدراوە...");
+                    } else {
+                        throw new Error("Firebase SDK نەدۆزرایەوە");
+                    }
+                })();
+                
+                await Promise.race([firebasePromise, timeoutPromise]);
             } catch(e) {
-                console.warn("⚠️ Firebase بار نەبوو، ئۆفلاین مۆد");
-                db = null;
+                console.warn("⚠️ کێشە لە فایەربەیس یان ئینتەرنێت:", e.message);
+                updateLoadStatus("ئۆفلاین مۆد...");
+                db = null; // کارکردن بە بێ داتابەیس
+                showToast("سیستەم لە دۆخی ئۆفلایندایە", "error");
             }
 
-            // ✅ چوارەم: بارکردنی مزگەوتەکان بە timeout
-            await Promise.race([
-                loadMosques(),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
-            ]).catch(e => {
-                console.warn("⚠️ بارکردنی مزگەوتەکان کات بەسەرچوو");
+            // دەستپێکردنی نەخشە
+            initMap();
+            
+            // بارکردنی داتا
+            // لێرە await بەکارناهێنین تا نەبێتە هۆی وەستانی بەرنامەکە
+            loadMosques().catch(e => {
+                console.error("❌ هەڵە لە بارکردنی مزگەوتەکان:", e);
                 mosques = BACKUP_MOSQUES;
                 renderMarkers();
                 updateStats();
             });
-
+            
+            // ئەگەر کتێبخانەی بانگ هەبوو، کاتەکان نوێ بکەرەوە
+            if (typeof adhan !== 'undefined') {
+                updatePrayerTimes();
+                setInterval(updatePrayerTimes, 60000);
+            }
+            
+            setInterval(updateCurrentTimeDisplay, 1000);
             autoDeleteOldFunerals();
-            setTimeout(removeSplash, 800);
 
-        } catch (error) {
-            console.error("❌ هەڵە:", error);
+            // لابردنی سپلاش سکرین بە شێوەی ئاسایی
+            setTimeout(removeSplash, 1500);
+
+        } catch (globalError) {
+            console.error("❌ هەڵەی گەورە (Critical Error):", globalError);
+            alert("هەڵەیەک ڕوویدا: " + globalError.message + "\nتکایە دڵنیابەرەوە لە ئینتەرنێت.");
+            // تەنانەت ئەگەر هەڵەش هەبێت، سپلاشەکە لاببە تا بەکارهێنەر شتێک ببینێت
+            removeSplash(); 
+        }
+    });
+
+
+    function skipLoading() {
+        console.log("📋 تاقیکردنەوەی پشتگرێدان دەکرێت...");
+        
+        // پەنجەمە کردن لە splash
+        const splash = document.getElementById('splashScreen');
+        splash.style.opacity = '0';
+        
+        // دەستپێکردنی نەخشە بە ڕێکخستنێکی سادە
+        setTimeout(() => {
+            splash.style.display = 'none';
+            
+            if(!map) {
+                initMapSimple();
+            }
+            
+            // بەکارهێنانی مزگەوتە بنەڕەتییەکان
             mosques = BACKUP_MOSQUES;
             renderMarkers();
             updateStats();
-            removeSplash();
+            
+            showToast('سیستەم لە مۆدی تاقیکردنەوەیە', 'info');
+        }, 500);
+    }
+
+    function initMapSimple() {
+        try {
+            map = L.map('map').setView([36.2369, 44.7869], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            showToast('نەخشە بارکرا (مۆدی سادە)', 'info');
+        } catch(e) {
+            console.error("❌ هەڵە لە مۆدی سادەی نەخشە:", e);
+            document.getElementById('map').innerHTML = 
+                '<div class="p-4 text-center"><p class="text-red-400">نەخشە بارنەکرا</p><button onclick="location.reload()" class="mt-2 px-4 py-2 bg-blue-600 rounded">هەوڵی دووبارە</button></div>';
         }
-    });
+    }
+
+    function updateLoadStatus(msg) {
+        const el = document.getElementById('loadStatus');
+        if(el) el.textContent = msg;
+    }
 
     function initMap() {
         try {
@@ -1126,15 +976,14 @@ function renderPrayerList(prayerSchedule) {
             }).setView([36.2369, 44.7869], 14);
 
             const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {maxZoom: 20});
+            const satelliteLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20});
+            const streetLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {maxZoom: 20});
+            const terrainLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {maxZoom: 20});
+
             darkLayer.addTo(map);
             currentTileLayer = darkLayer;
 
-            window.mapLayers = {
-                dark: darkLayer,
-                satellite: L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {maxZoom: 20}),
-                street: L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {maxZoom: 20}),
-                terrain: L.tileLayer('https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {maxZoom: 20})
-            };
+            window.mapLayers = {dark: darkLayer, satellite: satelliteLayer, street: streetLayer, terrain: terrainLayer};
             
             map.locate({setView: true, maxZoom: 15});
             map.on('locationfound', (e) => {
@@ -1151,15 +1000,19 @@ function renderPrayerList(prayerSchedule) {
                 updateNearbyCount();
             });
 
-            map.on('locationerror', () => console.log('شوێن نەدۆزرایەوە'));
+            map.on('locationerror', () => showToast('کێشە لە شوێن', 'error'));
             map.on('click', (e) => {
                 document.getElementById('mosqueLat').value = e.latlng.lat.toFixed(6);
                 document.getElementById('mosqueLng').value = e.latlng.lng.toFixed(6);
+                // بۆ بەشی دەستکاریش
                 document.getElementById('editMosqueLat').value = e.latlng.lat.toFixed(6);
                 document.getElementById('editMosqueLng').value = e.latlng.lng.toFixed(6);
             });
         } catch(e) {
-            console.error("❌ هەڵە لە نەخشە:", e);
+            console.error("❌ هەڵە لە دەستپێکردنی نەخشە:", e);
+            showToast('کێشە لە نەخشەکە', 'error');
+            // دەستپێکردنی جارێکی تر بە ڕێکخستنێکی سادەتر
+            setTimeout(initMapSimple, 1000);
         }
     }
 
@@ -1180,62 +1033,96 @@ function renderPrayerList(prayerSchedule) {
     }
 
     async function loadMosques() {
-        console.log("🚀 بارکردنی مزگەوتەکان...");
+        console.log("🚀 دەستپێکردنی بارکردنی مزگەوتەکان...");
+        
+        // زیادکردنی timeout بۆ OSM
+        const timeoutDuration = 15000; // 15 چرکە
         
         try {
-            // ✅ OSM بە timeout
-            let osmMosques = [];
+            // Fetch from OSM بە timeout
             const query = `[out:json];node["amenity"="place_of_worship"]["religion"="muslim"](36.21,44.75,36.26,44.83);out;`;
+            let osmMosques = [];
             
-            try {
-                const response = await Promise.race([
-                    fetch('https://overpass-api.de/api/interpreter', {method: 'POST', body: query}),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('OSM timeout')), 5000))
-                ]);
-                
-                const data = await response.json();
+            const osmPromise = fetch('https://overpass-api.de/api/interpreter', {
+                method: 'POST', 
+                body: query
+            }).then(res => res.json())
+              .then(data => {
                 osmMosques = data.elements.map(e => ({
                     id: 'osm_' + e.id,
                     name: e.tags['name:ckb'] || e.tags.name || 'مزگەوت',
                     lat: e.lat,
                     lng: e.lon
                 }));
-                console.log(`✅ ${osmMosques.length} مزگەوت لە OSM`);
-            } catch(e) {
-                console.warn("⚠️ OSM کار نەکرد");
-            }
+                console.log(`✅ ${osmMosques.length} مزگەوت لە OSM هێنرا`);
+                return osmMosques;
+            }).catch(e => {
+                console.warn("⚠️ OSM کار نەکرد:", e);
+                return [];
+            });
+            
+            // چاوەڕوانی بۆ OSM
+            osmMosques = await Promise.race([
+                osmPromise,
+                new Promise(resolve => setTimeout(() => {
+                    console.log("⏱️ OSM timeout");
+                    resolve([]);
+                }, timeoutDuration))
+            ]);
 
-            // ✅ Firebase
+            // Firebase
             if(db) {
+                console.log("🔥 Firebase بەردەستە، مزگەوتەکان بار دەکرێن...");
+                
+                // زیادکردنی callback بۆ هەڵە
                 db.ref('customMosques').on('value', (snap) => {
-                    const custom = snap.val() ? Object.values(snap.val()) : [];
-                    const all = [...BACKUP_MOSQUES, ...osmMosques, ...custom];
-                    mosques = all.filter((m, i, a) => a.findIndex(t => t.id === m.id) === i);
-                    console.log(`🎯 کۆی گشتی: ${mosques.length} مزگەوت`);
+                    try {
+                        const custom = snap.val() ? Object.values(snap.val()) : [];
+                        const all = [...BACKUP_MOSQUES, ...osmMosques, ...custom];
+                        mosques = all.filter((m, i, a) => a.findIndex(t => t.id === m.id) === i);
+                        console.log(`🎯 کۆی گشتی: ${mosques.length} مزگەوت`);
+                        renderMarkers();
+                        updateAdminSelect();
+                        updateEditMosqueSelect();
+                        updateStats();
+                    } catch(e) {
+                        console.error("❌ هەڵە لە Firebase customMosques:", e);
+                        mosques = [...BACKUP_MOSQUES, ...osmMosques];
+                        renderMarkers();
+                        updateStats();
+                    }
+                }, (error) => {
+                    console.error("❌ هەڵەی Firebase:", error);
+                    mosques = [...BACKUP_MOSQUES, ...osmMosques];
                     renderMarkers();
-                    updateAdminSelect();
-                    updateEditMosqueSelect();
                     updateStats();
                 });
 
                 db.ref('funerals').on('value', (snap) => {
                     funerals = snap.val() || {};
+                    console.log(`⚰️ ${Object.keys(funerals).length} پرسە چالاک`);
                     renderMarkers();
                     updateStats();
                     updateHeaderBadge();
                     updateAdminFuneralList();
                 });
+                
             } else {
+                console.log("📴 Firebase نییە، ئۆفلاین دەڕۆین");
                 mosques = [...BACKUP_MOSQUES, ...osmMosques];
+                console.log(`📱 کۆی گشتی (ئۆفلاین): ${mosques.length} مزگەوت`);
                 renderMarkers();
+                updateAdminSelect();
+                updateEditMosqueSelect();
                 updateStats();
             }
             
         } catch(e) {
-            console.error("❌ هەڵە لە بارکردن:", e);
+            console.error("❌ هەڵەی گشتی لە بارکردنی مزگەوتەکان:", e);
             mosques = BACKUP_MOSQUES;
             renderMarkers();
             updateStats();
+            throw e; // هەڵەکە دەرباز بکە بۆ catch ی سەرەکی
         }
     }
 
@@ -1339,6 +1226,209 @@ function renderPrayerList(prayerSchedule) {
         document.getElementById('searchInput').value = '';
     }
 
+    function updatePrayerTimes() {
+        // 1. ڕێکخستنی شوێن بۆ حاجیاوا
+        const coordinates = new adhan.Coordinates(36.2234, 44.8166);
+        const date = new Date();
+        
+        // 2. میتۆدی هەژمارکردن بۆ عێراق
+        const params = adhan.CalculationMethod.MuslimWorldLeague();
+        params.madhab = adhan.Madhab.Shafi; // مەزهەبی شافیعی
+        
+        // 3. ئیحتیاتەکان بۆ وردبینی (Adjustments)
+        params.adjustments.fajr = 2;      // +2 خولەک
+        params.adjustments.dhuhr = 1;     // +1 خولەک
+        params.adjustments.asr = 1;       // +1 خولەک
+        params.adjustments.maghrib = 2;   // +2 خولەک
+        params.adjustments.isha = 1;      // +1 خولەک
+        
+        // 4. وەرگرتنی کاتەکان
+        const prayerTimes = new adhan.PrayerTimes(coordinates, date, params);
+        
+        // 5. فۆرماتکردنی کات
+        function formatPrayerTime(time) {
+            let hours = time.getHours();
+            let minutes = time.getMinutes();
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            return `${hours}:${minutes}`;
+        }
+        
+        // 6. ناونیشانەکان بە کوردی
+        const prayerSchedule = [
+            {name: 'بەیانی', key: 'fajr', time: formatPrayerTime(prayerTimes.fajr), icon: 'fa-moon', arabic: 'الفجر'},
+            {name: 'خۆرهەڵاتن', key: 'sunrise', time: formatPrayerTime(prayerTimes.sunrise), icon: 'fa-sun', arabic: 'الشروق'},
+            {name: 'نیوەڕۆ', key: 'dhuhr', time: formatPrayerTime(prayerTimes.dhuhr), icon: 'fa-cloud-sun', arabic: 'الظهر'},
+            {name: 'عەسر', key: 'asr', time: formatPrayerTime(prayerTimes.asr), icon: 'fa-cloud', arabic: 'العصر'},
+            {name: 'مەغریب', key: 'maghrib', time: formatPrayerTime(prayerTimes.maghrib), icon: 'fa-sunset', arabic: 'المغرب'},
+            {name: 'عیشا', key: 'isha', time: formatPrayerTime(prayerTimes.isha), icon: 'fa-moon-stars', arabic: 'العشاء'}
+        ];
+        
+        // 7. نیشاندان لە HTML
+        const list = document.getElementById('prayerList');
+        list.innerHTML = '';
+        
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        
+        // بینینی کام نوێژ ئێستایە و کامی داهاتووە
+        let currentPrayerIndex = -1;
+        let nextPrayerIndex = -1;
+        
+        prayerSchedule.forEach((prayer, index) => {
+            const [hours, minutes] = prayer.time.split(':').map(Number);
+            const prayerMinutes = hours * 60 + minutes;
+            
+            if (prayerMinutes <= currentMinutes) {
+                currentPrayerIndex = index;
+            } else if (nextPrayerIndex === -1 && prayerMinutes > currentMinutes) {
+                nextPrayerIndex = index;
+            }
+        });
+        
+        // دروستکردنی لیست
+        prayerSchedule.forEach((prayer, index) => {
+            const [hours, minutes] = prayer.time.split(':').map(Number);
+            const prayerMinutes = hours * 60 + minutes;
+            const isCurrent = index === currentPrayerIndex;
+            const isNext = index === nextPrayerIndex;
+            
+            // کاتی ماوە
+            let timeRemaining = '';
+            if (prayerMinutes > currentMinutes) {
+                const remaining = prayerMinutes - currentMinutes;
+                const hoursRemaining = Math.floor(remaining / 60);
+                const minutesRemaining = remaining % 60;
+                timeRemaining = `${hoursRemaining > 0 ? hoursRemaining + 'ک' : ''}${minutesRemaining}خ`;
+            } else if (prayerMinutes < currentMinutes) {
+                timeRemaining = 'تەواو بوو';
+            }
+            
+            // زیادکردنی 30 خولەک بۆ نیوەڕۆی هەینی
+            let displayTime = prayer.time;
+            if (prayer.key === 'dhuhr' && now.getDay() === 5) { // هەینی
+                const h = parseInt(prayer.time.split(':')[0]);
+                const m = parseInt(prayer.time.split(':')[1]) + 30;
+                const newHours = h + Math.floor(m / 60);
+                const newMinutes = m % 60;
+                displayTime = `${newHours}:${newMinutes < 10 ? '0' : ''}${newMinutes}`;
+            }
+            
+            list.innerHTML += `
+                <div class="flex justify-between items-center p-4 rounded-2xl ${isCurrent ? 'bg-gradient-to-r from-blue-600/30 to-blue-800/30 border-2 border-blue-500/40' : isNext ? 'prayer-next' : 'glass-light'} transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br ${isCurrent ? 'from-blue-500 to-purple-500' : isNext ? 'from-blue-500/40 to-purple-500/40' : 'from-white/10 to-white/5'} flex items-center justify-center shadow-lg">
+                            <i class="fas ${prayer.icon} ${isCurrent ? 'text-white' : isNext ? 'text-blue-300' : 'text-gray-400'}"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm ${isCurrent ? 'text-white' : isNext ? 'text-blue-200' : 'text-gray-300'}">${prayer.name}</span>
+                                ${isCurrent ? '<span class="text-xs bg-blue-500/30 px-2 py-0.5 rounded-lg text-blue-200">ئێستا</span>' : ''}
+                                ${isNext ? '<span class="text-xs bg-blue-500/40 px-2 py-0.5 rounded-lg text-blue-200">داهاتوو</span>' : ''}
+                            </div>
+                            <span class="block text-[10px] ${isCurrent ? 'text-blue-300' : isNext ? 'text-blue-400' : 'text-gray-500'} mt-0.5">${prayer.arabic}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-mono text-lg font-bold ${isCurrent ? 'text-blue-200' : isNext ? 'text-blue-100' : 'text-gray-400'} block">${displayTime}</span>
+                        <span class="text-xs ${isCurrent ? 'text-blue-400' : isNext ? 'text-blue-300' : 'text-gray-500'} font-mono">${timeRemaining}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        // 8. نوێژەکانی داهاتوو نیشان بدە لە سەرەوە
+        if (nextPrayerIndex !== -1) {
+            const nextPrayer = prayerSchedule[nextPrayerIndex];
+            document.getElementById('prayerNotif').textContent = nextPrayer.name;
+            document.getElementById('prayerNotif').classList.remove('hidden');
+            
+            // تایمەر بۆ نوێژی داهاتوو
+            const [nextHours, nextMinutes] = nextPrayer.time.split(':').map(Number);
+            const nextPrayerMinutes = nextHours * 60 + nextMinutes;
+            const remainingMinutes = nextPrayerMinutes - currentMinutes;
+            
+            // ئەگەر هەینیە و نوێژی نیوەڕۆ داهاتووە
+            if (nextPrayer.key === 'dhuhr' && now.getDay() === 5) {
+                document.getElementById('prayerNotif').textContent = 'نیوەڕۆ (هەینی)';
+            }
+        } else {
+            // ئەگەر هەموو نوێژەکان تەواو بوون، نوێژی بەیانی دەستپێدەکە
+            document.getElementById('prayerNotif').textContent = 'بەیانی';
+            document.getElementById('prayerNotif').classList.remove('hidden');
+        }
+        
+        // 9. زیادکردنی تێبینی بۆ حاجیاوا
+        const notes = [
+            "کاتەکان بەپێی میتۆدی جیهانی ئیسلامی و مەزهەبی شافعیە",
+            "کاتی عەسر بەپێی شەفەی ئیمام شافعی هەژمار کراوە",
+            "لە مانگەکاندا کاتەکان ±١٠ خولەک دەگۆڕێن",
+            "کاتی مەغریب ٢ خولەک دوای ئاوەدان بوونی خۆرە",
+            "نوێژی هەینی لە حاجیاوا ٣٠ خولەک دواترە"
+        ];
+        const noteText = notes[Math.floor(Math.random() * notes.length)];
+        
+        const note = document.createElement('div');
+        note.className = 'mt-4 p-3 bg-blue-900/20 rounded-xl border border-blue-800/30';
+        note.innerHTML = `
+            <p class="text-xs text-blue-300 text-center prayer-kurdish">
+                <i class="fas fa-map-marker-alt ml-1"></i>
+                ${noteText}
+            </p>
+        `;
+        list.appendChild(note);
+        
+        updateCurrentTimeDisplay();
+    }
+
+    function updateCurrentTimeDisplay() {
+        const now = new Date();
+        
+        // ناوی مانگەکان بە کوردی
+        const kurdishMonths = [
+            'کانوونی دووەم', 'شوبات', 'ئازار', 'نیسان', 
+            'ئایار', 'حوزەیران', 'تەممووز', 'ئاب', 
+            'ئەیلوول', 'تشرینی یەکەم', 'تشرینی دووەم', 'کانوونی یەکەم'
+        ];
+        
+        // ناوی ڕۆژەکان بە کوردی
+        const kurdishDays = [
+            'یەکشەممە', 'دووشەممە', 'سێشەممە', 'چوارشەممە', 
+            'پێنجشەممە', 'هەینی', 'شەممە'
+        ];
+        
+        // کات بە شێوازی 24 سەعاتی
+        const time24 = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        // کات بە شێوازی 12 سەعاتی بۆ نیشاندان
+        const time12 = now.toLocaleTimeString('ckb-IQ', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const dayName = kurdishDays[now.getDay()];
+        const monthName = kurdishMonths[now.getMonth()];
+        const year = now.getFullYear();
+        const day = now.getDate();
+        
+        const dateString = `${dayName}، ${day} ${monthName} ${year}`;
+        
+        const el = document.getElementById('currentTime');
+        if(el) {
+            el.innerHTML = `
+                <div class="flex flex-col items-center gap-1">
+                    <div class="text-2xl font-mono font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">${time24}</div>
+                    <div class="text-sm text-gray-400 mt-1">${time12}</div>
+                    <div class="text-xs text-gray-500 mt-2 border-t border-white/10 pt-2 w-full">${dateString}</div>
+                </div>
+            `;
+        }
+    }
+
     function updateStats() {
         document.getElementById('totalMosques').textContent = mosques.length;
         document.getElementById('activeFunerals').textContent = Object.keys(funerals).length;
@@ -1403,10 +1493,12 @@ function renderPrayerList(prayerSchedule) {
         const tm = document.getElementById('tabMosque');
         const te = document.getElementById('tabEdit');
         
+        // هەموو تابیەکان بشارەوە
         ff.classList.add('hidden');
         mf.classList.add('hidden');
         ef.classList.add('hidden');
         
+        // هەموو تابەکان بیکە بە ناچالاک
         tf.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
         tm.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
         te.className = 'flex-1 py-3 rounded-xl text-gray-400 font-bold text-sm';
@@ -1472,6 +1564,7 @@ function renderPrayerList(prayerSchedule) {
 
     function updateEditMosqueSelect() {
         const s = document.getElementById('editMosqueSelect');
+        // تەنها مزگەوتەکانی زیادکراو (custom) نیشان بدە
         const customMosques = mosques.filter(m => m.id.startsWith('-') || m.id.includes('custom') || !BACKUP_MOSQUES.find(bm => bm.id === m.id));
         
         s.innerHTML = '<option value="">مزگەوتێک هەڵبژێرە...</option>' + 
@@ -1505,6 +1598,7 @@ function renderPrayerList(prayerSchedule) {
         const mosqueId = document.getElementById('editMosqueSelect').value;
         if(!mosqueId) return showToast('مزگەوتێک هەڵبژێرە', 'error');
         
+        // پشکنین بکە ئایە مزگەوتێکی زیادکراوە یان نا
         const isCustom = mosqueId.startsWith('-') || mosqueId.includes('custom') || !BACKUP_MOSQUES.find(m => m.id === mosqueId);
         if(!isCustom) return showToast('تەنها مزگەوتە زیادکراوەکان دەتوانرێن دەستکاری بکرێن', 'error');
         
@@ -1515,7 +1609,9 @@ function renderPrayerList(prayerSchedule) {
         
         if(!name || isNaN(lat) || isNaN(lng)) return showToast('پڕبکەرەوە', 'error');
         
+        // بینی ئایە لە Firebase-ە یان لە لیستی ئۆفلاین
         if(db) {
+            // لە Firebase دەستکاری بکە
             db.ref('customMosques').orderByChild('id').equalTo(mosqueId).once('value', (snapshot) => {
                 if(snapshot.exists()) {
                     const key = Object.keys(snapshot.val())[0];
@@ -1530,6 +1626,17 @@ function renderPrayerList(prayerSchedule) {
                     showToast('مزگەوت نەدۆزرایەوە', 'error');
                 }
             });
+        } else {
+            // لە لیستی ئۆفلاین دەستکاری بکە
+            const index = mosques.findIndex(m => m.id === mosqueId);
+            if(index !== -1) {
+                mosques[index].name = name;
+                mosques[index].lat = lat;
+                mosques[index].lng = lng;
+                mosques[index].description = description;
+                renderMarkers();
+                showToast('مزگەوت نوێکرایەوە (ئۆفلاین)');
+            }
         }
     }
 
@@ -1542,10 +1649,12 @@ function renderPrayerList(prayerSchedule) {
         const mosqueId = document.getElementById('editMosqueSelect').value;
         if(!mosqueId) return showToast('مزگەوتێک هەڵبژێرە', 'error');
         
+        // پشکنین بکە ئایە مزگەوتێکی زیادکراوە یان نا
         const isCustom = mosqueId.startsWith('-') || mosqueId.includes('custom') || !BACKUP_MOSQUES.find(m => m.id === mosqueId);
         if(!isCustom) return showToast('تەنها مزگەوتە زیادکراوەکان دەتوانرێن سڕدرێنەوە', 'error');
         
         if(db) {
+            // لە Firebase بسڕەوە
             db.ref('customMosques').orderByChild('id').equalTo(mosqueId).once('value', (snapshot) => {
                 if(snapshot.exists()) {
                     const key = Object.keys(snapshot.val())[0];
@@ -1558,6 +1667,14 @@ function renderPrayerList(prayerSchedule) {
                         .catch(err => showToast('هەڵە: ' + err.message, 'error'));
                 }
             });
+        } else {
+            // لە لیستی ئۆفلاین بسڕەوە
+            mosques = mosques.filter(m => m.id !== mosqueId);
+            renderMarkers();
+            updateEditMosqueSelect();
+            document.getElementById('editMosqueForm').classList.add('hidden');
+            document.getElementById('editMosqueSelect').value = '';
+            showToast('مزگەوت سڕدرایەوە (ئۆفلاین)');
         }
     }
 
