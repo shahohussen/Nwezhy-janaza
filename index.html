@@ -908,17 +908,10 @@
         renderPrayerList(fallback);
     }
 
-    function convertTo12Hour(time24) {
-    let [h, m] = time24.split(':').map(Number);
-    let period = h >= 12 ? 'PM' : 'AM';
     
-    // ئەگەر ئەتەوێت بە کوردی بێت ئەم دوو دێڕەی خوارەوە چالاک بکە:
-    // period = h >= 12 ? 'د.ن' : 'پ.ن'; 
-    return `${h}:${m < 10 ? '0' + m : m} ${period}`;
 }
 
-
-    function renderPrayerList(prayerSchedule) {
+function renderPrayerList(prayerSchedule) {
     const list = document.getElementById('prayerList');
     if (!list) return;
 
@@ -933,12 +926,13 @@
         }
     });
 
-    list.innerHTML = '';
+    list.innerHTML = ''; // خاڵیکردنەوەی لیستەکە
+
     prayerSchedule.forEach((prayer, index) => {
         const [hours, minutes] = prayer.time.split(':').map(Number);
         const prayerMinutes = hours * 60 + minutes;
         
-        // حیسابی کاتی ماوە
+        // --- ١. حیسابی کاتی ماوە ---
         let timeRemaining = '';
         if (prayerMinutes > currentMinutes) {
             const remaining = prayerMinutes - currentMinutes;
@@ -949,37 +943,53 @@
             timeRemaining = 'تەواو بوو';
         }
         
-        // ✅ هەنگاوی سەرەکی: ئامادەکردنی کاتەکە
-        let rawDisplayTime = prayer.time;
-        
-        // زیادکردنی 30 خولەک بۆ نیوەڕۆی هەینی (وەک خۆی دەمێنێتەوە)
+        // --- ٢. حیسابی کاتی هەینی و کاتی ئەسڵ ---
+        let displayTime = prayer.time;
         if (prayer.key === 'dhuhr' && now.getDay() === 5) {
             const h = parseInt(prayer.time.split(':')[0]);
             const m = parseInt(prayer.time.split(':')[1]) + 30;
             const newHours = h + Math.floor(m / 60);
             const newMinutes = m % 60;
-            rawDisplayTime = `${newHours}:${newMinutes < 10 ? '0' : ''}${newMinutes}`;
+            displayTime = `${newHours}:${newMinutes < 10 ? '0' : ''}${newMinutes}`;
         }
 
-        // ✅ لێرەدا کاتەکە دەگۆڕین بۆ ١٢ سەعاتی تەنها بۆ نیشاندان
-        const finalDisplayTime = convertTo12Hour(rawDisplayTime);
+        // --- ٣. گۆڕین بۆ ١٢ سەعاتی (گرنگترین بەش) ---
+        // لێرەدا کاتەکە دەگۆڕین و دەیکەینە گۆڕاوێکی نوێ بەناوی finalTime
+        let finalTime = convertTo12Hour(displayTime);
 
-        // دروستکردنی HTML
-        // تێبینی: لێرەدا دەبێت کۆدی HTML ـی خۆت بنووسیتەوە، من نموونەیەکم داناوە
+
+        // --- ٤. دروستکردنی HTML ---
+        // دڵنیابە لێرەدا `finalTime` بەکاردێنیت نەک `prayer.time`
+        
         const li = document.createElement('li');
-        li.className = index === nextPrayerIndex ? 'active-prayer' : ''; 
+        // ئەگەر دیزاینەکەت class-ی تایبەتی هەیە بۆ نوێژی داهاتوو، لێرە زیادی بکە
+        if (index === nextPrayerIndex) {
+            li.classList.add('active'); // یان هەر ناوێک کە خۆت بەکارت هێناوە
+        }
+
         li.innerHTML = `
-            <div class="prayer-info">
-                <i class="fas ${prayer.icon}"></i>
-                <span>${prayer.name}</span>
-            </div>
-            <div class="prayer-time">
-                <span class="time">${finalDisplayTime}</span>
+            <div class="prayer-item">
+                <span class="icon"><i class="fas ${prayer.icon}"></i></span>
+                <span class="name">${prayer.name}</span>
+                <span class="time" style="direction: ltr;">${finalTime}</span>
                 <span class="remaining">${timeRemaining}</span>
             </div>
         `;
+        
+        // ئەگەر شێوازی HTML-ەکەت جیاوازە، تکایە کۆدی HTML-ی خۆت لێرە دابنێ
+        // بەڵام لەجیاتی ${prayer.time} بنووسە ${finalTime}
+
         list.appendChild(li);
     });
+
+        function convertTo12Hour(time) {
+    let [h, m] = time.split(':').map(Number);
+    let period = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    h = h ? h : 12; // ئەگەر ٠ بوو بیکە بە ١٢
+    return `${h}:${m < 10 ? '0' + m : m} ${period}`;
+}
+
 }
 
             
