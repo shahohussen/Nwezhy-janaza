@@ -908,6 +908,16 @@
         renderPrayerList(fallback);
     }
 
+    function convertTo12Hour(time24) {
+    let [h, m] = time24.split(':').map(Number);
+    let period = h >= 12 ? 'PM' : 'AM';
+    
+    // ئەگەر ئەتەوێت بە کوردی بێت ئەم دوو دێڕەی خوارەوە چالاک بکە:
+    // period = h >= 12 ? 'د.ن' : 'پ.ن'; 
+    return `${h}:${m < 10 ? '0' + m : m} ${period}`;
+}
+
+
     function renderPrayerList(prayerSchedule) {
         const list = document.getElementById('prayerList');
         if (!list) return;
