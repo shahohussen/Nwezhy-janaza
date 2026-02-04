@@ -919,45 +919,69 @@
 
 
     function renderPrayerList(prayerSchedule) {
-        const list = document.getElementById('prayerList');
-        if (!list) return;
+    const list = document.getElementById('prayerList');
+    if (!list) return;
 
-        const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    
+    let nextPrayerIndex = -1;
+    prayerSchedule.forEach((prayer, index) => {
+        const [h, m] = prayer.time.split(':').map(Number);
+        if (h * 60 + m > currentMinutes && nextPrayerIndex === -1) {
+            nextPrayerIndex = index;
+        }
+    });
+
+    list.innerHTML = '';
+    prayerSchedule.forEach((prayer, index) => {
+        const [hours, minutes] = prayer.time.split(':').map(Number);
+        const prayerMinutes = hours * 60 + minutes;
         
-        let nextPrayerIndex = -1;
-        prayerSchedule.forEach((prayer, index) => {
-            const [h, m] = prayer.time.split(':').map(Number);
-            if (h * 60 + m > currentMinutes && nextPrayerIndex === -1) {
-                nextPrayerIndex = index;
-            }
-        });
+        // حیسابی کاتی ماوە
+        let timeRemaining = '';
+        if (prayerMinutes > currentMinutes) {
+            const remaining = prayerMinutes - currentMinutes;
+            const hoursRemaining = Math.floor(remaining / 60);
+            const minutesRemaining = remaining % 60;
+            timeRemaining = hoursRemaining > 0 ? `${hoursRemaining}ک ${minutesRemaining}خ` : `${minutesRemaining}خ`;
+        } else {
+            timeRemaining = 'تەواو بوو';
+        }
+        
+        // ✅ هەنگاوی سەرەکی: ئامادەکردنی کاتەکە
+        let rawDisplayTime = prayer.time;
+        
+        // زیادکردنی 30 خولەک بۆ نیوەڕۆی هەینی (وەک خۆی دەمێنێتەوە)
+        if (prayer.key === 'dhuhr' && now.getDay() === 5) {
+            const h = parseInt(prayer.time.split(':')[0]);
+            const m = parseInt(prayer.time.split(':')[1]) + 30;
+            const newHours = h + Math.floor(m / 60);
+            const newMinutes = m % 60;
+            rawDisplayTime = `${newHours}:${newMinutes < 10 ? '0' : ''}${newMinutes}`;
+        }
 
-        list.innerHTML = '';
-        prayerSchedule.forEach((prayer, index) => {
-            const [hours, minutes] = prayer.time.split(':').map(Number);
-            const prayerMinutes = hours * 60 + minutes;
-            const isNext = index === nextPrayerIndex;
-            
-            let timeRemaining = '';
-            if (prayerMinutes > currentMinutes) {
-                const remaining = prayerMinutes - currentMinutes;
-                const hoursRemaining = Math.floor(remaining / 60);
-                const minutesRemaining = remaining % 60;
-                timeRemaining = hoursRemaining > 0 ? `${hoursRemaining}ک ${minutesRemaining}خ` : `${minutesRemaining}خ`;
-            } else {
-                timeRemaining = 'تەواو بوو';
-            }
-            
-            // ✅ زیادکردنی 30 خولەک بۆ نیوەڕۆی هەینی
-            let displayTime = prayer.time;
-            if (prayer.key === 'dhuhr' && now.getDay() === 5) {
-                const h = parseInt(prayer.time.split(':')[0]);
-                const m = parseInt(prayer.time.split(':')[1]) + 30;
-                const newHours = h + Math.floor(m / 60);
-                const newMinutes = m % 60;
-                displayTime = `${newHours}:${newMinutes < 10 ? '0' : ''}${newMinutes}`;
-            }
+        // ✅ لێرەدا کاتەکە دەگۆڕین بۆ ١٢ سەعاتی تەنها بۆ نیشاندان
+        const finalDisplayTime = convertTo12Hour(rawDisplayTime);
+
+        // دروستکردنی HTML
+        // تێبینی: لێرەدا دەبێت کۆدی HTML ـی خۆت بنووسیتەوە، من نموونەیەکم داناوە
+        const li = document.createElement('li');
+        li.className = index === nextPrayerIndex ? 'active-prayer' : ''; 
+        li.innerHTML = `
+            <div class="prayer-info">
+                <i class="fas ${prayer.icon}"></i>
+                <span>${prayer.name}</span>
+            </div>
+            <div class="prayer-time">
+                <span class="time">${finalDisplayTime}</span>
+                <span class="remaining">${timeRemaining}</span>
+            </div>
+        `;
+        list.appendChild(li);
+    });
+}
+
             
             list.innerHTML += `
                 <div class="flex justify-between items-center p-4 rounded-2xl ${isNext ? 'prayer-next' : 'glass-light'} transition-all">
